@@ -52,3 +52,19 @@ class DataTests(unittest.TestCase):
         fresh = app.create_initial_prompts()
         self.assertNotEqual(fresh[0]['title'], 'changed')
         self.assertFalse(fresh[0]['favorite'])
+
+
+class InputTests(unittest.TestCase):
+    def test_required_text_retries_whitespace(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'read_required_text'))
+        result, output = invoke(app.read_required_text, '제목: ', inputs=['', '  ', ' 제목 '])
+        self.assertEqual(result, '제목')
+        self.assertIn('입력', output)
+
+    def test_category_retries_invalid_choices(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'select_category'))
+        result, output = invoke(app.select_category, inputs=['x', '1.5', '-1', '0', '7', '²', '2'])
+        self.assertEqual(result, '이미지 생성')
+        self.assertIn('카테고리', output)

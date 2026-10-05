@@ -41,6 +41,27 @@ def create_initial_prompts() -> list[dict]:
     ]
 
 
+def read_required_text(label: str) -> str:
+    while True:
+        value = input(label).strip()
+        if value:
+            return value
+        print('빈 값은 입력할 수 없습니다. 다시 입력해주세요.')
+
+
+def select_category() -> str:
+    print('카테고리 선택:')
+    for number, category in enumerate(CATEGORIES, start=1):
+        print(f'{number}) {category}')
+    while True:
+        choice = input('선택: ').strip()
+        # 문자열로 비교해 숫자가 아닌 입력도 예외 없이 처리한다.
+        for number, category in enumerate(CATEGORIES, start=1):
+            if choice == str(number):
+                return category
+        print('잘못된 카테고리 번호입니다. 다시 선택해주세요.')
+
+
 def show_menu() -> None:
     print('\n=== 나만의 프롬프트 관리 ===')
     print('1. 프롬프트 추가')
