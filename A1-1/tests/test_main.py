@@ -167,3 +167,28 @@ class DetailTests(unittest.TestCase):
                 self.assertNotIn('첫 내용', output)
         _, output = invoke(app.show_detail, [], inputs=['1'])
         self.assertIn('없습니다', output)
+
+
+class ToggleTests(unittest.TestCase):
+    def test_toggle_twice_restores_state_and_updates_other_views(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'toggle_favorite'))
+        prompts = sample_prompts()
+        invoke(app.toggle_favorite, prompts, inputs=['3'])
+        self.assertTrue(prompts[2]['favorite'])
+        _, output = invoke(app.show_list, prompts)
+        self.assertIn('3. [텍스트 생성] Python 튜터 ⭐', output)
+        _, output = invoke(app.show_detail, prompts, inputs=['3'])
+        self.assertIn('즐겨찾기: ⭐', output)
+        invoke(app.toggle_favorite, prompts, inputs=['3'])
+        self.assertFalse(prompts[2]['favorite'])
+        self.assertEqual(prompts, sample_prompts())
+
+    def test_invalid_favorite_number_does_not_change_data(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'toggle_favorite'))
+        prompts = sample_prompts()
+        for choice in ['0', '-1', '4', 'x', '1.5', '']:
+            _, output = invoke(app.toggle_favorite, prompts, inputs=[choice])
+            self.assertIn('잘못된', output)
+            self.assertEqual(prompts, sample_prompts())
