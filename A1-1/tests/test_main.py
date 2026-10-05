@@ -192,3 +192,21 @@ class ToggleTests(unittest.TestCase):
             _, output = invoke(app.toggle_favorite, prompts, inputs=[choice])
             self.assertIn('잘못된', output)
             self.assertEqual(prompts, sample_prompts())
+
+
+class FavoriteListTests(unittest.TestCase):
+    def test_favorite_list_filters_and_preserves_numbers(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'show_favorites'))
+        prompts = sample_prompts()
+        _, output = invoke(app.show_favorites, prompts)
+        self.assertIn('2. [이미지 생성] 둘째 제목 ⭐', output)
+        self.assertNotIn('첫 제목', output)
+        self.assertNotIn('Python 튜터', output)
+        invoke(app.toggle_favorite, prompts, inputs=['3'])
+        _, output = invoke(app.show_favorites, prompts)
+        self.assertIn('총 2개', output)
+        invoke(app.toggle_favorite, prompts, inputs=['2'])
+        invoke(app.toggle_favorite, prompts, inputs=['3'])
+        _, output = invoke(app.show_favorites, prompts)
+        self.assertIn('없습니다', output)

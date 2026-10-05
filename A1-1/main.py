@@ -150,6 +150,15 @@ def toggle_favorite(prompts: list[dict]) -> None:
     print(f"'{prompt['title']}' 즐겨찾기를 {action}했습니다!")
 
 
+def show_favorites(prompts: list[dict]) -> None:
+    print('\n=== 즐겨찾기 목록 ===')
+    items = []
+    for number, prompt in enumerate(prompts, start=1):
+        if prompt['favorite']:
+            items.append((number, prompt))
+    print_prompt_list(items)
+
+
 def show_menu() -> None:
     print('\n=== 나만의 프롬프트 관리 ===')
     print('1. 프롬프트 추가')
@@ -183,7 +192,7 @@ def main() -> None:
         elif choice == '6':
             toggle_favorite(prompts)
         elif choice == '7':
-            print('준비 중인 기능입니다.')
+            show_favorites(prompts)
         else:
             print('잘못된 메뉴 번호입니다. 다시 선택해주세요.')
 
