@@ -88,4 +88,4 @@ git --no-pager log --oneline --graph -15
 
 기존 상위 저장소와 원격 연결, 상위 `.gitignore`를 그대로 사용했습니다. 다른 과제는 변경하지 않았습니다. 기능 단위로 커밋했고, 목록 기능은 `codex/prompt-list` 브랜치에서 구현 후 로컬 `checkout`과 `merge --no-ff`로 main에 병합했습니다.
 
-이번 작업에서 `add`, `commit`, `pull`, `checkout`, `clone`, `merge`를 수행했으며 최종 코드는 기존 원격으로 `push`합니다. 공개 샘플 `octocat/Hello-World`를 별도 임시 폴더에 clone해 README와 로그를 확인했습니다. 저장소 초기화 금지 요청에 따라 `init`은 다시 실행하지 않았습니다. 과제에서 요구하는 `init` 실습 증빙은 기존 저장소 준비 과정의 기록을 사용해야 합니다.
+이번 작업에서 `add`, `commit`, `pull`, `checkout`, `clone`, `merge`, `push`를 수행했고 최종 코드를 기존 원격에 반영했습니다. 공개 샘플 `octocat/Hello-World`를 별도 임시 폴더에 clone해 README와 로그를 확인했습니다. 저장소 초기화 금지 요청에 따라 `init`은 다시 실행하지 않았습니다. 과제에서 요구하는 `init` 실습 증빙은 기존 저장소 준비 과정의 기록을 사용해야 합니다.
