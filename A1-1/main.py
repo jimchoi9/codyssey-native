@@ -113,6 +113,33 @@ def search_prompts(prompts: list[dict]) -> None:
     print_prompt_list(items)
 
 
+def select_prompt(prompts: list[dict]) -> dict | None:
+    if not prompts:
+        print('프롬프트가 없습니다.')
+        return None
+    choice = input('프롬프트 번호 입력: ').strip()
+    for number, prompt in enumerate(prompts, start=1):
+        if choice == str(number):
+            return prompt
+    print('잘못된 프롬프트 번호입니다.')
+    return None
+
+
+def show_detail(prompts: list[dict]) -> None:
+    print('\n=== 프롬프트 상세 보기 ===')
+    prompt = select_prompt(prompts)
+    if prompt is None:
+        return
+    print('-' * 40)
+    print(f"제목: {prompt['title']}")
+    print(f"카테고리: {prompt['category']}")
+    favorite = '⭐' if prompt['favorite'] else '미등록'
+    print(f'즐겨찾기: {favorite}')
+    print('내용:')
+    print(prompt['content'])
+    print('-' * 40)
+
+
 def show_menu() -> None:
     print('\n=== 나만의 프롬프트 관리 ===')
     print('1. 프롬프트 추가')
@@ -141,7 +168,9 @@ def main() -> None:
             show_by_category(prompts)
         elif choice == '4':
             search_prompts(prompts)
-        elif choice in ('5', '6', '7'):
+        elif choice == '5':
+            show_detail(prompts)
+        elif choice in ('6', '7'):
             print('준비 중인 기능입니다.')
         else:
             print('잘못된 메뉴 번호입니다. 다시 선택해주세요.')

@@ -141,3 +141,29 @@ class SearchTests(unittest.TestCase):
         _, output = invoke(app.search_prompts, sample_prompts(), inputs=[' ', '없는키워드'])
         self.assertIn('없습니다', output)
         self.assertNotIn('첫 제목', output)
+
+
+class DetailTests(unittest.TestCase):
+    def test_detail_displays_all_fields_and_entire_multiline_content(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'show_detail'))
+        prompts = sample_prompts()
+        prompts[2]['content'] = '첫 줄\n둘째 줄\n마지막 줄'
+        for choice, expected in [('1', '첫 제목'), ('3', '첫 줄\n둘째 줄\n마지막 줄')]:
+            _, output = invoke(app.show_detail, prompts, inputs=[choice])
+            self.assertIn(expected, output)
+            self.assertIn('텍스트 생성', output)
+            self.assertIn('즐겨찾기:', output)
+        _, output = invoke(app.show_detail, prompts, inputs=['2'])
+        self.assertIn('⭐', output)
+
+    def test_invalid_detail_numbers_do_not_select_a_prompt(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'show_detail'))
+        for value in ['', 'abc', '1.5', '-1', '0', '4', '²', '9' * 5000]:
+            with self.subTest(value=value[:20]):
+                _, output = invoke(app.show_detail, sample_prompts(), inputs=[value])
+                self.assertIn('잘못된', output)
+                self.assertNotIn('첫 내용', output)
+        _, output = invoke(app.show_detail, [], inputs=['1'])
+        self.assertIn('없습니다', output)
