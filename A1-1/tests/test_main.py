@@ -122,3 +122,22 @@ class CategoryTests(unittest.TestCase):
         self.assertTrue(hasattr(app, 'show_by_category'))
         _, output = invoke(app.show_by_category, sample_prompts(), inputs=['6'])
         self.assertIn('없습니다', output)
+
+
+class SearchTests(unittest.TestCase):
+    def test_search_matches_title_or_content_case_insensitively(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'search_prompts'))
+        for query, expected, absent in [('pYtHoN', '3. [텍스트 생성] Python 튜터', '첫 제목'),
+                                        ('둘째 내용', '2. [이미지 생성] 둘째 제목', 'Python 튜터')]:
+            with self.subTest(query=query):
+                _, output = invoke(app.search_prompts, sample_prompts(), inputs=[query])
+                self.assertIn(expected, output)
+                self.assertNotIn(absent, output)
+
+    def test_blank_search_retries_and_no_match_is_reported(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'search_prompts'))
+        _, output = invoke(app.search_prompts, sample_prompts(), inputs=[' ', '없는키워드'])
+        self.assertIn('없습니다', output)
+        self.assertNotIn('첫 제목', output)

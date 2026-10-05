@@ -102,6 +102,17 @@ def show_by_category(prompts: list[dict]) -> None:
     print_prompt_list(items)
 
 
+def search_prompts(prompts: list[dict]) -> None:
+    print('\n=== 프롬프트 검색 ===')
+    keyword = read_required_text('검색어: ').casefold()
+    items = []
+    for number, prompt in enumerate(prompts, start=1):
+        if keyword in prompt['title'].casefold() or keyword in prompt['content'].casefold():
+            items.append((number, prompt))
+    print('검색 결과:')
+    print_prompt_list(items)
+
+
 def show_menu() -> None:
     print('\n=== 나만의 프롬프트 관리 ===')
     print('1. 프롬프트 추가')
@@ -128,7 +139,9 @@ def main() -> None:
             show_list(prompts)
         elif choice == '3':
             show_by_category(prompts)
-        elif choice in ('4', '5', '6', '7'):
+        elif choice == '4':
+            search_prompts(prompts)
+        elif choice in ('5', '6', '7'):
             print('준비 중인 기능입니다.')
         else:
             print('잘못된 메뉴 번호입니다. 다시 선택해주세요.')
