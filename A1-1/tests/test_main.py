@@ -80,3 +80,28 @@ class AddTests(unittest.TestCase):
         self.assertEqual(prompts[:-1], original)
         self.assertEqual(prompts[-1], {'title': '새 제목', 'content': '새 내용',
                                        'category': '텍스트 생성', 'favorite': False})
+
+
+def sample_prompts():
+    return [
+        {'title': '첫 제목', 'content': '첫 내용', 'category': '텍스트 생성', 'favorite': False},
+        {'title': '둘째 제목', 'content': '둘째 내용', 'category': '이미지 생성', 'favorite': True},
+        {'title': 'Python 튜터', 'content': '학습 요약', 'category': '텍스트 생성', 'favorite': False},
+    ]
+
+
+class ListTests(unittest.TestCase):
+    def test_list_shows_numbers_categories_and_favorites(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'show_list'))
+        _, output = invoke(app.show_list, sample_prompts())
+        self.assertIn('1. [텍스트 생성] 첫 제목', output)
+        self.assertIn('2. [이미지 생성] 둘째 제목 ⭐', output)
+        self.assertIn('3. [텍스트 생성] Python 튜터', output)
+        self.assertIn('총 3개', output)
+
+    def test_empty_list_reports_no_prompts(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'show_list'))
+        _, output = invoke(app.show_list, [])
+        self.assertIn('없습니다', output)
