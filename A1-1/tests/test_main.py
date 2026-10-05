@@ -34,3 +34,21 @@ class MenuTests(unittest.TestCase):
         self.assertEqual(result.stdout.count('=== 나만의 프롬프트 관리 ==='), 5)
         self.assertIn('잘못된 메뉴', result.stdout)
         self.assertIn('종료합니다', result.stdout)
+
+
+class DataTests(unittest.TestCase):
+    def test_initial_data_is_complete_and_fresh_each_run(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'create_initial_prompts'))
+        prompts = app.create_initial_prompts()
+        self.assertGreaterEqual(len(prompts), 3)
+        for prompt in prompts:
+            self.assertTrue(prompt['title'].strip())
+            self.assertTrue(prompt['content'].strip())
+            self.assertIn(prompt['category'], app.CATEGORIES)
+            self.assertIsInstance(prompt['favorite'], bool)
+        prompts[0]['title'] = 'changed'
+        prompts[0]['favorite'] = True
+        fresh = app.create_initial_prompts()
+        self.assertNotEqual(fresh[0]['title'], 'changed')
+        self.assertFalse(fresh[0]['favorite'])
