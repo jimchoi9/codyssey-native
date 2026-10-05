@@ -210,3 +210,36 @@ class FavoriteListTests(unittest.TestCase):
         invoke(app.toggle_favorite, prompts, inputs=['3'])
         _, output = invoke(app.show_favorites, prompts)
         self.assertIn('없습니다', output)
+
+
+class ConsoleFlowTests(unittest.TestCase):
+    def run_console(self, text):
+        result = subprocess.run([sys.executable, '-B', str(ROOT / 'main.py')],
+                                input=text, text=True, capture_output=True, timeout=5)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result.stdout
+
+    def test_all_menus_share_data_and_restart_resets_it(self):
+        output = self.run_console(
+            '1\n스크린샷용 프롬프트\n회의 내용을 세 문장으로 요약해주세요.\n1\n'
+            '2\n3\n1\n4\n세 문장\n5\n4\n6\n4\n7\n5\n4\n6\n4\n7\n0\n'
+        )
+        self.assertIn('프롬프트가 추가되었습니다', output)
+        self.assertIn('총 4개의 프롬프트', output)
+        self.assertIn('4. [텍스트 생성] 스크린샷용 프롬프트', output)
+        self.assertIn('내용:\n회의 내용을 세 문장으로 요약해주세요.', output)
+        favorite_section = output.split('=== 즐겨찾기 목록 ===')[1]
+        self.assertIn('4. [텍스트 생성] 스크린샷용 프롬프트 ⭐', favorite_section)
+        self.assertIn('즐겨찾기: ⭐', favorite_section)
+        last_favorites = output.split('=== 즐겨찾기 목록 ===')[2]
+        self.assertIn('프롬프트가 없습니다', last_favorites)
+        fresh = self.run_console('2\n7\n0\n')
+        self.assertIn('총 3개의 프롬프트', fresh)
+        self.assertNotIn('스크린샷용 프롬프트', fresh)
+        self.assertIn('프롬프트가 없습니다', fresh.split('=== 즐겨찾기 목록 ===')[1])
+
+    def test_eof_at_menu_or_during_add_exits_without_traceback(self):
+        for text in ['', '1\n제목\n']:
+            with self.subTest(text=text):
+                output = self.run_console(text)
+                self.assertIn('종료합니다', output)

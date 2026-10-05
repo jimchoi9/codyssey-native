@@ -198,4 +198,7 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except (EOFError, KeyboardInterrupt):
+        print('\n입력이 중단되어 프로그램을 종료합니다.')
