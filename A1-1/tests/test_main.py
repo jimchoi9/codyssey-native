@@ -68,3 +68,15 @@ class InputTests(unittest.TestCase):
         result, output = invoke(app.select_category, inputs=['x', '1.5', '-1', '0', '7', '²', '2'])
         self.assertEqual(result, '이미지 생성')
         self.assertIn('카테고리', output)
+
+
+class AddTests(unittest.TestCase):
+    def test_add_preserves_existing_data_and_defaults_favorite_false(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'add_prompt'))
+        prompts = app.create_initial_prompts()
+        original = [dict(prompt) for prompt in prompts]
+        invoke(app.add_prompt, prompts, inputs=[' ', '새 제목', '', '새 내용', '1'])
+        self.assertEqual(prompts[:-1], original)
+        self.assertEqual(prompts[-1], {'title': '새 제목', 'content': '새 내용',
+                                       'category': '텍스트 생성', 'favorite': False})

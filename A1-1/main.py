@@ -62,6 +62,20 @@ def select_category() -> str:
         print('잘못된 카테고리 번호입니다. 다시 선택해주세요.')
 
 
+def add_prompt(prompts: list[dict]) -> None:
+    print('\n=== 프롬프트 추가 ===')
+    title = read_required_text('제목: ')
+    content = read_required_text('내용: ')
+    category = select_category()
+    prompts.append({
+        'title': title,
+        'content': content,
+        'category': category,
+        'favorite': False,
+    })
+    print('프롬프트가 추가되었습니다!')
+
+
 def show_menu() -> None:
     print('\n=== 나만의 프롬프트 관리 ===')
     print('1. 프롬프트 추가')
@@ -82,7 +96,9 @@ def main() -> None:
         if choice == '0':
             print('프로그램을 종료합니다.')
             break
-        elif choice in ('1', '2', '3', '4', '5', '6', '7'):
+        elif choice == '1':
+            add_prompt(prompts)
+        elif choice in ('2', '3', '4', '5', '6', '7'):
             print('준비 중인 기능입니다.')
         else:
             print('잘못된 메뉴 번호입니다. 다시 선택해주세요.')
