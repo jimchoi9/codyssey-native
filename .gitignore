@@ -19,3 +19,7 @@ Desktop.ini
 # Temporary files
 *.tmp
 *.temp
+
+# A1-1 local tests and planning documents
+/A1-1/tests/
+/A1-1/docs/
