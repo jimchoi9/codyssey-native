@@ -105,3 +105,20 @@ class ListTests(unittest.TestCase):
         self.assertTrue(hasattr(app, 'show_list'))
         _, output = invoke(app.show_list, [])
         self.assertIn('없습니다', output)
+
+
+class CategoryTests(unittest.TestCase):
+    def test_category_filter_preserves_original_numbers(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'show_by_category'))
+        _, output = invoke(app.show_by_category, sample_prompts(), inputs=['1'])
+        self.assertIn('1. [텍스트 생성] 첫 제목', output)
+        self.assertIn('3. [텍스트 생성] Python 튜터', output)
+        self.assertNotIn('둘째 제목', output)
+        self.assertIn('총 2개', output)
+
+    def test_empty_category_reports_no_prompts(self):
+        app = load_app()
+        self.assertTrue(hasattr(app, 'show_by_category'))
+        _, output = invoke(app.show_by_category, sample_prompts(), inputs=['6'])
+        self.assertIn('없습니다', output)

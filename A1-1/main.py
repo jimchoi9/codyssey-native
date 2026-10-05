@@ -91,6 +91,17 @@ def show_list(prompts: list[dict]) -> None:
     print_prompt_list(list(enumerate(prompts, start=1)))
 
 
+def show_by_category(prompts: list[dict]) -> None:
+    print('\n=== 카테고리별 조회 ===')
+    category = select_category()
+    items = []
+    for number, prompt in enumerate(prompts, start=1):
+        if prompt['category'] == category:
+            items.append((number, prompt))
+    print(f'[{category}] 카테고리 프롬프트:')
+    print_prompt_list(items)
+
+
 def show_menu() -> None:
     print('\n=== 나만의 프롬프트 관리 ===')
     print('1. 프롬프트 추가')
@@ -115,7 +126,9 @@ def main() -> None:
             add_prompt(prompts)
         elif choice == '2':
             show_list(prompts)
-        elif choice in ('3', '4', '5', '6', '7'):
+        elif choice == '3':
+            show_by_category(prompts)
+        elif choice in ('4', '5', '6', '7'):
             print('준비 중인 기능입니다.')
         else:
             print('잘못된 메뉴 번호입니다. 다시 선택해주세요.')
