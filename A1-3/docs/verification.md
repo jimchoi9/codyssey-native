@@ -37,7 +37,11 @@
 
 Vercel Production 배포 빌드 성공. URL: https://levelly-english-coach.vercel.app
 
-현재 로그인 보호가 적용되어 공개 접근 승인을 기다리는 중이다. GitHub 저장소 연결은 Vercel GitHub 앱 설치가 필요하여 사용자 조치 대기 중이다. GitHub 작업 브랜치는 푸시 완료했다. 비로그인 접근 검증과 GitHub 자동 배포 연동은 아직 완료로 표시하지 않는다.
+사용자가 이 프로젝트의 공개 접근을 명시적으로 승인한 후 Vercel Authentication 보호를 해제했다. 로그인 없는 새 Chrome에서 200자 이상 샘플의 실제 AI 변환과 A1/B2 표시를 확인했다. 배포 URL에서도 브라우저 자동 검사 전체가 통과했다.
+
+실제 HTTP 검증: `/` 200, `/css/style.css` 200, 빈 입력 `/api/rewrite` 400 JSON, `/.env.local` 및 `/services/coach.py` 404. 인증 우회 토큰 없이 검사했다.
+
+GitHub `jimchoi9/codyssey-native`와 Vercel 연동 완료. Root Directory는 `A1-3`으로 설정한다. 작업은 `codex/english-level-coach` 브랜치에 기록하며 기존 main과 다른 과제 파일은 수정하지 않는다. Git 연동 후 마지막 배포 상태는 아래 기록을 따른다.
 
 ## 과제 요구사항 대응
 
@@ -49,5 +53,5 @@ Vercel Production 배포 빌드 성공. URL: https://levelly-english-coach.verce
 | 반응형 | 390·768·1440px 검사, 데스크톱·모바일 캡처 |
 | AI UX | 폼·결과·로딩·오류·원문 유지 |
 | Python AI API | api/rewrite.py → services/coach.py → Gemini |
-| Vercel 배포 | 배포 상태 참조 |
-| 제출 5종 | README·기획서·GitHub·배포 URL·증빙. 배포 완료 시 최종 확인 |
+| Vercel 배포 | 공개 URL 실제 동작 확인, GitHub 연동 |
+| 제출 5종 | README·기획서·GitHub·배포 URL·증빙 준비 |
