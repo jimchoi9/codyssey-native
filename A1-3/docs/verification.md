@@ -41,7 +41,7 @@ Vercel Production 배포 빌드 성공. URL: https://levelly-english-coach.verce
 
 실제 HTTP 검증: `/` 200, `/css/style.css` 200, 빈 입력 `/api/rewrite` 400 JSON, `/.env.local` 및 `/services/coach.py` 404. 인증 우회 토큰 없이 검사했다.
 
-GitHub `jimchoi9/codyssey-native`와 Vercel 연동 완료. Root Directory는 `A1-3`으로 설정한다. 작업은 `codex/english-level-coach` 브랜치에 기록하며 기존 main과 다른 과제 파일은 수정하지 않는다. Git 연동 후 마지막 배포 상태는 아래 기록을 따른다.
+GitHub `jimchoi9/codyssey-native`와 Vercel 연동 완료. Root Directory는 `A1-3`으로 설정했다. 작업은 `codex/english-level-coach` 브랜치에 기록하며 기존 main과 다른 과제 파일은 수정하지 않는다. 마지막 기능 검증 커밋 `1c610fa`의 GitHub 푸시로 Vercel 자동 배포가 생성되었고, GitHub Vercel 상태 검사와 배포 상태가 모두 성공/READY로 확인됐다.
 
 ## 과제 요구사항 대응
 
