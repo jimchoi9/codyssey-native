@@ -10,7 +10,7 @@
 
 ## 배포 및 저장소
 
-- 배포 URL: 배포 검증 후 기입
+- 배포 URL: https://levelly-english-coach.vercel.app (현재 Vercel 로그인 보호 적용)
 - GitHub: https://github.com/jimchoi9/codyssey-native/tree/codex/english-level-coach/A1-3
 - 모노레포 프로젝트 경로: `A1-3`
 
