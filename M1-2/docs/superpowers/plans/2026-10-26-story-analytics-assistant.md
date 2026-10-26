@@ -252,13 +252,13 @@ def test_zero_baseline_is_not_zero_percent():
 **Files:** Modify README.md, docs/deployment-checklist.md. Create `docs/screenshots/{chat-summary,data-management,conversation-history}.png`.
 **Interfaces:** Consumes 서비스 인증·배포 대상. Produces 검증한 URL·스크린샷·최종 상태.
 
-- [ ] 키를 출력하지 않고 준비 상태 확인. 미준비 서비스만 대기하며 나머지 검증은 계속한다.
-- [ ] Firebase 대상 확인 후 CSV dry-run과 적재. 빈 DB 기준 created=120, 재실행 created=0/skipped=120 확인. 기존 기록은 차이를 보고하고 강제 덮어쓰기하지 않는다.
-- [ ] 실제 Firestore/GPT로 소수 질문을 보내 근거·복원·최신 데이터 사용 확인. 파괴적 테스트는 fake에서 수행하고 원본을 임의 수정하지 않는다.
-- [ ] GitHub 반영→Render /docs→Vercel 배포→API_BASE_URL/CORS 최종 연결. 승인 필요한 외부 작업은 준비된 구체적 변경을 제시한다.
-- [ ] 배포URL에서 채팅·데이터 조작·복원·지연 안내 확인 후 스크린샷3점과 실제URL 기록. 시연용 기록은 원본과 겹치지 않게 만들고 정리해 기존 상태를 복원한다.
-- [ ] 독립 최종 리뷰로 SPEC 전체·diff·테스트 증거 대조. 중요 미해결 결함은 완료 처리하지 않는다. 변경이 없으면 같은 테스트를 반복하지 않는다.
-- [ ] `docs: record deployment and submission evidence`로 커밋하고 로컬·실연동·배포 결과를 구분해 보고한다.
+- [x] 키를 출력하지 않고 준비 상태 확인. 미준비 서비스만 대기하며 나머지 검증은 계속한다.
+- [x] Firebase 대상 확인 후 CSV dry-run과 적재. 빈 DB 기준 created=120, 재실행 created=0/skipped=120 확인. 기존 기록은 차이를 보고하고 강제 덮어쓰기하지 않는다.
+- [x] 실제 Firestore/GPT로 소수 질문을 보내 근거·복원·최신 데이터 사용 확인. 파괴적 테스트는 fake에서 수행하고 원본을 임의 수정하지 않는다.
+- [x] GitHub 반영→Render /docs→Vercel 배포→API_BASE_URL/CORS 최종 연결. 승인 필요한 외부 작업은 준비된 구체적 변경을 제시한다.
+- [x] 배포URL에서 채팅·데이터 조작·복원·지연 안내 확인 후 스크린샷3점과 실제URL 기록. 시연용 기록은 원본과 겹치지 않게 만들고 정리해 기존 상태를 복원한다.
+- [x] 독립 최종 리뷰로 SPEC 전체·diff·테스트 증거 대조. 중요 미해결 결함은 완료 처리하지 않는다. 변경이 없으면 같은 테스트를 반복하지 않는다.
+- [x] `docs: record deployment and submission evidence`로 커밋하고 로컬·실연동·배포 결과를 구분해 보고한다.
 
 ## 계획 자기 검토와 재개 기준
 
@@ -279,3 +279,7 @@ Task 2/5/7/9 완료. 백엔드65개·프론트15개 테스트 PASS, 정적 빌�
 ## 단계 2~4 실행 중 확인한 변경
 
 Copa 게이트웨이는 reasoning_effort를 허용하지 않는다. 실제 요약 질문은 초기512토큰을 추론에 모두 사용하여 빈 응답(length)이 발생했고, 2048 한도에서907토큰·정상종료로 확인했다. 따라서 출력 기본 한도를2048로 조정하고45초·재시도0회는 유지한다. 이 검증 결과가 Task6의 초기512 설정보다 우선한다. 실제 적재120개/재실행120개 건너뛰기 완료. 최종 배포·증거는 작업 보고서를 따른다.
+
+## 최종 완료
+
+단계2·3·4 완료. 백엔드113/프론트단위15/HTTP대체브라우저12/로컬API브라우저2 통과. 실제CSV120적재 및 재실행보존, 실제GPT저장·복원·최신데이터 반영, main반영·공개Render/Vercel검증·스크린샷3점 완료. 상세는 docs/stages-2-4-report.md. 보너스 제외 유지.

@@ -29,16 +29,16 @@
 - [x] Render Firebase Secret File 및 GOOGLE_APPLICATION_CREDENTIALS 경로 일치 (사용자 재배포로 503 해결)
 - [x] Render virtual key·Base URL·모델 및 Vercel 출처 CORS 설정 완료
 - [x] Vercel `https://codyssey-native-frontend.vercel.app`, 공개 config.js API URL 일치
-- [ ] 이번 변경 main 반영 후 Render/Vercel 최종 배포 확인
-- [ ] 공개 /docs·대화 API·CORS·실제 브라우저 CRUD/채팅/복원 확인
+- [x] 이번 변경 main 반영 후 Render/Vercel 최종 배포 확인 (/docs·대화 API200)
+- [x] 공개 /docs·대화 API·CORS·실제 브라우저 CRUD/채팅/복원 확인
 
 Blueprint Path는 `M1-2/render.yaml`, Render rootDir는 `M1-2/backend`입니다. Vercel Root Directory는 `M1-2/frontend`, 설정은 `frontend/vercel.json`, Build Command는 `npm run build`, Output Directory는 `dist`입니다. Secret File의 실제 경로는 `/etc/secrets/firebase-service-account.json`입니다.
 
 ## 제출 증거
 
-- [ ] docs/screenshots/chat-summary.png
-- [ ] docs/screenshots/data-management.png
-- [ ] docs/screenshots/conversation-history.png
-- [ ] README와 단계 보고서에 실제 결과 반영
+- [x] docs/screenshots/chat-summary.png
+- [x] docs/screenshots/data-management.png
+- [x] docs/screenshots/conversation-history.png
+- [x] README와 단계 보고서에 실제 결과 반영
 
 파괴적·경쟁 상태 테스트는 fake에서 수행합니다. 실제 데이터 검증용 임시 기록은 원본 날짜와 겹치지 않게 생성하고 삭제해 원상복구합니다. 합성 테스트 화면은 제출용 실제 화면으로 표시하지 않습니다.

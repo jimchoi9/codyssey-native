@@ -86,3 +86,7 @@ macOS에서는 설치된 Chrome을 자동 사용합니다. 다른 환경은 Play
 Render 백엔드 Root Directory는 `M1-2/backend`, 시작 명령은 `uvicorn app.main:app --host 0.0.0.0 --port "$PORT"`입니다. Blueprint를 쓰면 Path는 `M1-2/render.yaml`입니다. Vercel Root Directory는 `M1-2/frontend`, Build Command는 `npm run build`, Output Directory는 `dist`이며 설정은 `frontend/vercel.json`에 있습니다. `main` 변경을 두 서비스가 배포한 뒤 공개 API와 CORS를 확인합니다.
 
 [OpenAI Chat Completions 파라미터](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create), [Render 설정](https://render.com/docs/blueprint-spec), [Vercel 설정](https://vercel.com/docs/project-configuration/vercel-json)을 참고했습니다.
+
+## 제출 화면
+
+실제 배포에서 촬영한 [채팅·요약](docs/screenshots/chat-summary.png), [데이터 관리](docs/screenshots/data-management.png), [대화 복원](docs/screenshots/conversation-history.png)을 제공합니다. 공개 서비스에서 대화 API200, 질문·자동 저장·복원·CRUD·CORS·360px 화면을 확인했습니다.
