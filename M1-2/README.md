@@ -1,18 +1,17 @@
 # 동화 열람 데이터 AI 비서
 
-일별 동화 열람 횟수를 관리하고 기간별 통계에 근거한 답변을 제공하는 학습 프로젝트입니다. Python/FastAPI, Firebase Firestore, OpenAI Python SDK, 바닐라 HTML/CSS/JavaScript를 사용합니다.
+일별 동화 열람 횟수를 관리하고, 저장된 데이터의 통계에 근거해 한국어로 답하는 학습 프로젝트입니다. Python/FastAPI, Firestore, OpenAI Python SDK와 바닐라 HTML/CSS/JavaScript를 사용합니다. 보너스 기능은 포함하지 않습니다.
 
-Stage 1에서 데이터 CRUD, 요약 계산, 화면 및 정적 빌드를 로컬에서 구현·검증했습니다. CSV 가져오기, 대화 저장 API, GPT 채팅 백엔드는 다음 단계이며 아직 구현되지 않았습니다. 화면의 채팅·대화 영역은 해당 API 구현 후 연결 검증이 필요합니다. 실제 Firestore/GPT 연결, 실데이터 적재, 공개 서비스 배포 검증은 수행하지 않았습니다.
+- 프론트: https://codyssey-native-frontend.vercel.app
+- API: https://codyssey-native.onrender.com
+- Swagger: https://codyssey-native.onrender.com/docs
+- GitHub: `jimchoi9/codyssey-native`, 배포 브랜치 `main`
 
-| 제출 항목 | 상태 |
-| --- | --- |
-| 프론트 URL | 미배포 / 미확인 |
-| API URL 및 Swagger `/docs` | 미배포 / 미확인 |
-| 채팅·요약, 데이터 관리, 대화 복원 스크린샷 | 미촬영 |
+데이터 CRUD·요약, CSV 가져오기, AI 채팅, 대화 자동 저장·불러오기·삭제를 구현했습니다. 단계 2~4의 최신 검증·배포 결과는 [작업 보고서](docs/stages-2-4-report.md)와 [배포 체크리스트](docs/deployment-checklist.md)에 기록합니다. 구현 테스트와 실제 배포 확인은 구분합니다.
 
-## 로컬 준비와 실행
+## 로컬 실행
 
-작업 디렉터리는 Git 저장소 `codyssey` 안의 `M1-2`입니다. 현재 구현 작업 사본은 `/Users/choijimin/.codex/worktrees/story-analytics-assistant/codyssey/M1-2`입니다. 아래 명령은 `M1-2`에서 시작합니다. Python 3.10 이상과 Node.js 20 이상이 필요합니다. 실제 검증한 Python 버전과 테스트 결과는 단계 보고서를 따릅니다.
+저장소 안의 `M1-2`에서 시작합니다. Python 3.10 이상과 Node.js 20 이상이 필요하며, 현재 Python 3.13으로 검증했습니다.
 
 ```sh
 python3 -m venv backend/.venv
@@ -23,9 +22,7 @@ cd backend
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
-`cp -n`은 기존 `backend/.env`를 덮어쓰지 않습니다. `backend/.env`의 실제 값은 로컬에서 직접 입력합니다. `/docs`는 `http://localhost:8000/docs`입니다. 데이터 API는 Firestore 자격 증명이 있어야 실제 저장소에 접근합니다. 키 없는 테스트는 fake 저장소를 사용합니다.
-
-다른 터미널에서 `M1-2`를 기준으로 프론트를 생성하고 실행합니다. 런타임 의존 패키지가 없는 Node 빌드이며 `npm install`은 필수가 아닙니다.
+`backend/.env`에 실제 값을 입력합니다. 기존 파일은 덮어쓰지 않습니다. Swagger는 `http://localhost:8000/docs`입니다. 다른 터미널에서:
 
 ```sh
 cd frontend
@@ -33,57 +30,59 @@ API_BASE_URL=http://localhost:8000 npm run build
 python3 -m http.server 5500 --directory dist
 ```
 
-`http://localhost:5500`에서 엽니다. 빌드는 `dist/config.js`에 `window.APP_CONFIG`를 생성하며 공개 `API_BASE_URL`만 기록합니다. 값 누락, 상대 경로, HTTP(S) 이외 프로토콜, URL 내 인증 정보는 빌드 오류입니다. `index.html`, `styles.css`, `js/`만 복사하며 이전 dist를 지웁니다. 설정 변경 후 다시 빌드합니다. 소스를 직접 제공하려면 `config.example.js`를 참고해 로컬 `config.js`를 만들어야 하므로 위 dist 방식이 권장됩니다.
+`http://localhost:5500`에서 확인합니다. 정적 빌드 자체는 런타임 패키지를 요구하지 않습니다. 브라우저 테스트용 패키지는 아래 검증 단계에서 설치합니다.
 
-## 설정
+## 설정과 처리 규칙
 
-| 변수 | 위치 / 용도 |
+| 변수 | 위치와 값 |
 | --- | --- |
-| API_BASE_URL | 프론트 빌드 환경. 백엔드 기본 URL, `/api`를 덧붙이지 않음 |
-| ALLOWED_ORIGINS | 서버. 쉼표로 구분한 정확한 프론트 출처. 로컬 예: `http://localhost:5500` |
-| FIREBASE_PROJECT_ID | 서버. `story-analytics-assistant` |
-| GOOGLE_APPLICATION_CREDENTIALS | 서버. 서비스 계정 JSON의 절대 경로 |
-| OPENAI_API_KEY | 서버. 학습장 발급 virtual key |
-| OPENAI_BASE_URL | 서버. `https://copa.codyssey.kr/v1` |
-| OPENAI_MODEL | 서버. `gpt-5-mini` |
+| API_BASE_URL | Vercel 공개 빌드 설정: `https://codyssey-native.onrender.com` |
+| ALLOWED_ORIGINS | 서버 허용 출처: `https://codyssey-native-frontend.vercel.app`; 로컬은 `http://localhost:5500` |
+| FIREBASE_PROJECT_ID | 서버: `story-analytics-assistant` |
+| GOOGLE_APPLICATION_CREDENTIALS | 서버 전용 서비스 계정 파일 절대 경로; Render `/etc/secrets/firebase-service-account.json` |
+| OPENAI_API_KEY | 서버에만 학습장 virtual key 입력 |
+| OPENAI_BASE_URL | `https://copa.codyssey.kr/v1` |
+| OPENAI_MODEL | `gpt-5-mini` |
 
-키와 서비스 계정 파일은 서버에만 두며 Git, 프론트 소스/배포 결과, 로그에 기록하지 않습니다. 현재 외부 연결 설정은 준비용입니다. 향후 채팅 어댑터는 Chat Completions를 사용하며 출력 512토큰, 요청 타임아웃 45초, SDK 자동 재시도 0회, 질문 최대 4000자, 이전 메시지 최근 20개 전달을 적용할 예정입니다. 프론트는 요청 중 로딩, 10초 이후 지연 안내, 60초 타임아웃을 제공합니다. Render 첫 요청이 지연될 수 있으므로 응답을 기다리며 자동 재전송하지 않습니다.
+서비스 계정 JSON과 키를 Git·프론트·로그에 기록하지 않습니다. Render Secret File 이름과 환경 변수의 파일명이 정확히 일치해야 합니다. `.env`의 로컬 경로는 해당 컴퓨터의 실제 파일 위치를 사용합니다.
 
-## 로컬 검증
+AI는 Chat Completions를 사용합니다. `max_completion_tokens=2048`, 요청 타임아웃 45초, SDK 자동 재시도 0회입니다. 2048 한도에는 추론 토큰도 포함됩니다. 질문 최대 4000자, 이전 메시지 최근 20개를 전달합니다. 비어 있거나 잘린 AI 응답은 502로 처리하고 저장하지 않습니다. 데이터가 없으면 AI 호출 없이 기록 추가 안내를 저장합니다. 저장 실패를 성공으로 표시하지 않습니다.
 
-```sh
-# M1-2에서
-cd backend
-python -m pytest -q
-# 다시 M1-2에서
-cd frontend
-npm test
-API_BASE_URL=http://localhost:8000 npm run build
-```
+프론트는 로딩, 10초 후 지연 안내, 60초 타임아웃을 제공합니다. Render의 첫 요청은 지연될 수 있습니다. 자동 재전송은 하지 않습니다. Firestore 트랜잭션은 충돌 시 최대 3회 시도하며, 내부 트랜잭션 RPC는 SDK 기본 시간 제한을 사용합니다. 외부 서비스 지연 때 프론트 타임아웃 이후 서버 작업이 완료될 수 있으므로 다시 보내기 전 대화 기록을 확인하세요.
 
-`npm test`는 `tests/*.test.mjs`의 API 헬퍼·대화 화면 상태·빌드 테스트를 실행합니다. 빌드 테스트는 임시 소스로 공개 설정만 포함되는지, 비밀·CSV·불필요 파일 제외, URL 오류 처리를 확인합니다. API 테스트와 fake 기반 테스트는 실제 외부 서비스 검증을 의미하지 않습니다.
+요약 기준은 저장된 마지막 날짜입니다. 최초~마지막 날짜 사이 누락일은 0회, 14일 이상이면 7일씩 비교하고 그보다 짧으면 같은 길이의 두 구간을 비교합니다. 2일 미만이면 비교 부족, 이전 평균이 0이면 변화율은 `null`입니다. 열람 횟수는 이용자 수가 아니며 메모를 인과관계의 증거로 단정하지 않습니다. 상세 규칙은 [명세](SPEC.md)에 있습니다.
 
-`npm run test:e2e`는 현재 미구현 안내와 실패 코드를 반환합니다. 이후 Task 8에서 Playwright 의존성, 설정, 시나리오를 준비한 뒤 실행 명령으로 교체해야 합니다. 현재 통과한 E2E 검증은 없습니다.
+## CSV 가져오기
 
-## CSV 가져오기 — 후속 단계 전용
-
-원본 `moriai_daily_book_views_120days.csv`는 UTF-8 BOM의 `date,value,memo` 형식이며 120개의 고유 날짜를 포함합니다. Stage 1에서 요약 집계나 DB 적재를 실행하지 않았습니다. 가져오기 모듈 구현 전에는 다음 명령을 실행할 수 없습니다.
+원본 `moriai_daily_book_views_120days.csv`는 로컬 과제 폴더에 보관합니다. 헤더는 정확히 `date,value,memo`, UTF-8 BOM을 지원하며 빈 메모를 허용합니다. 저장하기 전에 모든 행과 중복 날짜를 검증합니다.
 
 ```sh
-# 향후 Task 3 구현 후 backend에서만 실행 가능
+# backend에서, 첫 명령은 검증·건수 확인만 수행
 python -m scripts.import_csv --file ../moriai_daily_book_views_120days.csv --dry-run
-# 실제 DB 대상 확인 및 적재 승인 후 실행
 python -m scripts.import_csv --file ../moriai_daily_book_views_120days.csv
 ```
 
-예정 동작은 전체 행 검증 후 쓰기, 기존 날짜 건너뛰기, created/skipped 보고입니다. 원본 CSV와 Firestore는 자동 동기화하지 않습니다. 누락 날짜는 요약 계산에서만 0회로 보완합니다.
+기존 날짜는 건너뛰며 덮어쓰지 않습니다. 중간 통신 장애는 완료한 `created/skipped` 건수와 함께 비정상 종료하고, 재실행하면 남은 날짜부터 진행할 수 있습니다. 이후 Firestore가 서비스의 기준 데이터이며 CSV와 자동 동기화하지 않습니다.
 
-## 배포 준비
+## 검증
 
-실제 배포 절차와 미완료 항목은 [배포 체크리스트](docs/deployment-checklist.md)를 따릅니다. Render Blueprint Path는 `M1-2/render.yaml`, 백엔드 rootDir는 Git 루트 기준 `M1-2/backend`입니다. Vercel Project Root Directory는 `M1-2/frontend`, 설정 파일은 **`frontend/vercel.json`**입니다. 계획의 `M1-2/vercel.json` 위치는 선택한 프로젝트 루트와 달라 수정했습니다. 빌드는 `npm run build`, 출력은 `dist`입니다. Vercel에 공개 API URL을 설정하고 Render CORS에 최종 프론트 출처를 등록해야 합니다.
+```sh
+# backend에서: 외부 키를 읽지 않는 테스트
+python -m pytest -q
+# frontend에서
+npm ci
+npm test
+npx playwright install chromium
+npm run test:e2e
+npm run test:integration
+```
 
-[Render Blueprint 공식 문서](https://render.com/docs/infrastructure-as-code), [Render 스키마](https://render.com/docs/blueprint-spec), [Vercel 설정](https://vercel.com/docs/project-configuration/vercel-json), [Vercel 빌드 설정](https://vercel.com/docs/builds/configure-a-build)을 2026-10-26 확인했습니다. 설정 파일 작성은 원격 배포 또는 서비스 생성 완료를 의미하지 않습니다.
+macOS에서는 설치된 Chrome을 자동 사용합니다. 다른 환경은 Playwright Chromium을 설치하거나 `PLAYWRIGHT_CHANNEL`을 지정합니다. `test:integration`은 기본적으로 `backend/.venv/bin/python`을 쓰며 다른 환경에서는 `BACKEND_PYTHON`으로 지정할 수 있습니다.
 
-## 단계 1 검증 결과
+`test:e2e`는 HTTP 응답을 대체해 오류·빈 상태·HTML 표시·삭제·복원을 검증합니다. `test:integration`은 실제 로컬 FastAPI와 메모리 저장소/가짜 AI를 연결해 추가→요약→채팅→새로고침·복원→수정→갱신된 답변을 검증합니다. 두 테스트 모두 실제 Firestore/GPT 검증과 구분합니다.
 
-백엔드65개, 프론트15개 테스트와 정적 빌드가 통과했습니다. 합성 응답을 사용한 브라우저 화면 확인(1280px/360px)에서 JavaScript 오류와 페이지 가로 넘침은 없었습니다. 이는 실제 서비스 전체 E2E 검증과 구분합니다. 상세 범위는 [단계 1 작업 요약](docs/stage-1-report.md)에 기록했습니다.
+## 배포와 제출
+
+Render 백엔드 Root Directory는 `M1-2/backend`, 시작 명령은 `uvicorn app.main:app --host 0.0.0.0 --port "$PORT"`입니다. Blueprint를 쓰면 Path는 `M1-2/render.yaml`입니다. Vercel Root Directory는 `M1-2/frontend`, Build Command는 `npm run build`, Output Directory는 `dist`이며 설정은 `frontend/vercel.json`에 있습니다. `main` 변경을 두 서비스가 배포한 뒤 공개 API와 CORS를 확인합니다.
+
+[OpenAI Chat Completions 파라미터](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create), [Render 설정](https://render.com/docs/blueprint-spec), [Vercel 설정](https://vercel.com/docs/project-configuration/vercel-json)을 참고했습니다.

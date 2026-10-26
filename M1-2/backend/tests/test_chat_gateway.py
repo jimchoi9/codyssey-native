@@ -13,10 +13,11 @@ class Client:
         return self.response
 def result(content='answer', finish_reason='stop'):
     return NS(choices=[NS(message=NS(content=content, refusal=None), finish_reason=finish_reason)])
-def test_chat_completions_preserves_visible_token_budget():
+def test_chat_completions_omits_unsupported_reasoning_effort():
     client = Client(result())
     assert OpenAIChatGateway(client, 'gpt-5-mini', 512).complete('rules', [MessageInput(role='user', content='question')]) == 'answer'
-    assert client.kwargs == dict(model='gpt-5-mini', max_completion_tokens=512, reasoning_effort='minimal',
+    assert 'reasoning_effort' not in client.kwargs
+    assert client.kwargs == dict(model='gpt-5-mini', max_completion_tokens=512,
         messages=[{'role':'system', 'content':'rules'}, {'role':'user', 'content':'question'}])
 @pytest.mark.parametrize('response', [result(''), result('  '), result(None), result('partial', 'length'),
     result('blocked', 'content_filter'), NS(choices=[]), NS(), RuntimeError('secret'), result(['malformed'])])

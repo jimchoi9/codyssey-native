@@ -13,7 +13,7 @@ class Settings:
     openai_api_key: str | None = field(default=None, repr=False)
     openai_base_url: str | None = None
     openai_model: str | None = None
-    openai_max_output_tokens: int = 512
+    openai_max_output_tokens: int = 2048
     openai_timeout_seconds: float = 45
     openai_max_retries: int = 0
 

@@ -16,6 +16,7 @@ def test_openai_client_is_lazy_bounded_and_closed(monkeypatch):
     gateway = dependencies.get_chat_gateway()
     constructor.assert_not_called()
     assert gateway.complete('rules', []) == 'answer'
+    assert client.chat.completions.create.call_args.kwargs['max_completion_tokens'] == 2048
     constructor.assert_called_once_with(api_key='test-key', base_url='https://gateway.example/v1', timeout=45, max_retries=0)
     client.close.assert_called_once_with()
 

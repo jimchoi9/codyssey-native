@@ -19,7 +19,7 @@ Copy `.env.example` to `backend/.env` (or `.env` when already in this directory)
 to configure exact, comma-separated frontend origins. Never paste real keys into chat
 or commit `.env` or service-account JSON. Firebase and OpenAI credentials remain
 server-only and are unnecessary for Stage 0 tests. The configured model is gpt-5-mini via the Copa Chat Completions gateway. The adapter
-uses a 512 completion token limit, minimal reasoning effort, a 45 second timeout,
+uses a 2048 completion token limit, a 45 second timeout,
 and zero automatic retries. Gateway initialization occurs only when generation is needed;
 empty-data replies are saved without OpenAI credentials.
 

@@ -1,54 +1,44 @@
 # 배포·제출 체크리스트
 
-현재 단계: Stage 1 로컬 CRUD·요약·화면·빌드 준비. CSV 가져오기·대화·채팅 백엔드 및 실제 서비스 검증은 미완료입니다. 이 문서는 후속 실행 기준이며 체크되지 않은 항목을 실행 완료로 해석하지 않습니다.
+2026-10-26. 사용자 설정 확인, 자동 테스트, 실제 서비스 검증을 구분해 기록합니다.
 
-## 로컬 준비
+## 로컬 검증 완료
 
-- [ ] 총괄 통합 후 backend 전체 pytest와 frontend npm test 결과 기록
-- [ ] 실제 프론트로 API_BASE_URL을 지정해 빌드하고 dist 제공 확인
-- [ ] Task 3 CSV importer, Task 4 대화 API, Task 6 채팅 API 구현·fake 테스트
-- [ ] Task 8 Playwright 의존성·설정·시나리오 구현 및 실행; 현재 test:e2e는 미구현 실패 안내
-- [ ] 모바일 360px·일반 화면·키보드 접근·오류/빈 상태 검증
+- [x] CSV 가져오기·대화 API·AI 채팅 구현 및 독립 리뷰
+- [x] 백엔드 전체 113개, 프론트 단위 15개 통과
+- [x] Playwright HTTP 대체 12개 및 실제 로컬 API+fake 통합 2개 통과
+- [x] 데스크톱·360px, 키보드, 오류·빈 상태, 안전한 HTML 표시 검증
+- [x] 공개 빌드에는 API_BASE_URL만 포함; CSV·비밀 제외
 
-## 실제 연결 — 후속 단계
+## 실제 연결
 
-- [ ] Firebase 대상 story-analytics-assistant 및 서비스 계정 권한 확인
-- [ ] 서버 환경에 virtual key, Copa Base URL, gpt-5-mini, 서비스 계정 경로 설정
-- [ ] importer 구현 후 CSV dry-run 실행 (검증만, 집계·쓰기 없음)
-- [ ] 실제 적재 대상·승인 확인 후 가져오기, created/skipped 기록
-- [ ] 재실행 시 기존 값 보존 확인 (빈 DB 최초 적재라면 120 생성, 재실행 120 건너뜀)
-- [ ] 실제 GPT Chat Completions 소수 호출로 기간·지표·0 기준값 설명 확인
-- [ ] 대화 자동 저장·복원·이어가기·최신 요약 반영 확인
+- [x] 지정 Firebase 프로젝트 `story-analytics-assistant`에 SDK 인증으로 접근
+- [x] CSV dry-run 120개 형식 검증
+- [x] 최초 가져오기 created=120/skipped=0
+- [x] 재실행 created=0/skipped=120 (덮어쓰기 없음)
+- [x] Copa Chat Completions 지원 옵션 확인: reasoning_effort 미지원, max_completion_tokens 지원
+- [x] 512토큰 빈 응답 원인 확인; 2048 한도에서 정상 답변 확인
+- [ ] 앱을 통한 실제 AI 대화 저장·복원·이어가기 최종 확인
 
-## Render — 후속 단계
+## 배포 설정
 
-- [ ] GitHub 저장소의 Git 루트가 codyssey임을 확인하고 변경 반영
-- [ ] Blueprint Path를 M1-2/render.yaml로 선택 (기본값은 저장소 루트 render.yaml)
-- [ ] 서비스 rootDir M1-2/backend, build pip install -r requirements.txt 확인
-- [ ] start uvicorn app.main:app --host 0.0.0.0 --port "$PORT" 확인
-- [ ] 비밀 환경 변수를 대시보드에서 입력; 키/JSON을 YAML에 쓰지 않음
-- [ ] 서비스 계정 JSON을 Render Secret File로 제공하고 GOOGLE_APPLICATION_CREDENTIALS에 실제 절대 경로 설정
-- [ ] ALLOWED_ORIGINS에 최종 Vercel 출처만 정확히 등록 (경로·끝 슬래시 제외)
-- [ ] 생성 대상 확인 후 배포, 공개 /docs 접근 및 API 요청 검증
+아래 서비스 설정은 사용자 보고에 기반합니다. 공개 URL 및 연결 값은 별도로 확인했습니다.
 
-## Vercel — 후속 단계
+- [x] GitHub `jimchoi9/codyssey-native`, 배포 브랜치 main
+- [x] Render `https://codyssey-native.onrender.com`, Python 3.13.5
+- [x] Render Firebase Secret File 및 GOOGLE_APPLICATION_CREDENTIALS 경로 일치 (사용자 재배포로 503 해결)
+- [x] Render virtual key·Base URL·모델 및 Vercel 출처 CORS 설정 완료
+- [x] Vercel `https://codyssey-native-frontend.vercel.app`, 공개 config.js API URL 일치
+- [ ] 이번 변경 main 반영 후 Render/Vercel 최종 배포 확인
+- [ ] 공개 /docs·대화 API·CORS·실제 브라우저 CRUD/채팅/복원 확인
 
-- [ ] Project Root Directory M1-2/frontend, Framework Other 확인
-- [ ] frontend/vercel.json 사용 확인. M1-2/vercel.json을 두지 않음
-- [ ] Build Command npm run build, Output Directory dist 확인
-- [ ] API_BASE_URL을 Render 서비스 기본 URL로 설정 (비밀키는 등록하지 않음)
-- [ ] 배포 후 config.js 공개 값과 CORS 프리플라이트 확인
-- [ ] 원본 CSV·서버 비밀·.env가 dist에 없는지 확인
+Blueprint Path는 `M1-2/render.yaml`, Render rootDir는 `M1-2/backend`입니다. Vercel Root Directory는 `M1-2/frontend`, 설정은 `frontend/vercel.json`, Build Command는 `npm run build`, Output Directory는 `dist`입니다. Secret File의 실제 경로는 `/etc/secrets/firebase-service-account.json`입니다.
 
-설정 위치 근거: [Render Blueprint 경로](https://render.com/docs/infrastructure-as-code), [Render rootDir·필드](https://render.com/docs/blueprint-spec), [Vercel 프로젝트 설정 파일](https://vercel.com/docs/project-configuration/vercel-json), [Vercel Root Directory·빌드](https://vercel.com/docs/builds/configure-a-build). 2026-10-26 공식 문서 확인; 원격 검증은 아직 수행하지 않았습니다.
+## 제출 증거
 
-## 제출 증거 — 미완료
+- [ ] docs/screenshots/chat-summary.png
+- [ ] docs/screenshots/data-management.png
+- [ ] docs/screenshots/conversation-history.png
+- [ ] README와 단계 보고서에 실제 결과 반영
 
-- [ ] 프론트 URL: 미정
-- [ ] API URL / Swagger URL: 미정
-- [ ] 배포 화면에서 CRUD와 요약 갱신 검증; 시험 기록 정리
-- [ ] 실제 채팅·로딩·지연·오류 및 이전 대화 복원 검증
-- [ ] docs/screenshots/chat-summary.png 촬영
-- [ ] docs/screenshots/data-management.png 촬영
-- [ ] docs/screenshots/conversation-history.png 촬영
-- [ ] README에 검증된 URL·스크린샷·실제 결과만 반영
+파괴적·경쟁 상태 테스트는 fake에서 수행합니다. 실제 데이터 검증용 임시 기록은 원본 날짜와 겹치지 않게 생성하고 삭제해 원상복구합니다. 합성 테스트 화면은 제출용 실제 화면으로 표시하지 않습니다.

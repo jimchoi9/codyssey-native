@@ -15,12 +15,12 @@ async function fixture(page,{records=[record],conversations=[conversation],chat}
     const req=route.request(), path=new URL(req.url()).pathname, method=req.method();
     const body=req.postDataJSON(); calls.push({path,method,body});
     const json=(value,status=200)=>route.fulfill({status,json:value});
-    if(path==='/api/data/summary')return json(records.length?summary:{...summary,count:0,period:null,calendar_days:0,filled_zero_days:0,metrics:{total:0,daily_average:null,max:null,min:null},comparison:{...summary.comparison,status:'insufficient_data',window_days:0,previous:null,recent:null,trend:'insufficient_data'},notable_memos:[]});
+    if(path==='/api/data/summary'&&method==='GET')return json(records.length?summary:{...summary,count:0,period:null,calendar_days:0,filled_zero_days:0,metrics:{total:0,daily_average:null,max:null,min:null},comparison:{...summary.comparison,status:'insufficient_data',window_days:0,previous:null,recent:null,trend:'insufficient_data'},notable_memos:[]});
     if(path==='/api/data'&&method==='GET')return json({items:records});
     if(path==='/api/data'&&method==='POST'){records.push({id:body.date,...body});return json(records.at(-1),201);}
     if(path.startsWith('/api/data/')&&method==='PUT'){Object.assign(records.find(x=>x.id===path.split('/').at(-1)),body);return json(records[0]);}
     if(path.startsWith('/api/data/')&&method==='DELETE'){records=[];return route.fulfill({status:204});}
-    if(path==='/api/conversations')return json({items:conversations.map(({messages,...item})=>item)});
+    if(path==='/api/conversations'&&method==='GET')return json({items:conversations.map(({messages,...item})=>item)});
     if(path===`/api/conversations/${conversation.id}`&&method==='GET')return json(conversation);
     if(path===`/api/conversations/${conversation.id}`&&method==='DELETE'){conversations=[];return route.fulfill({status:204});}
     if(path==='/api/chat'&&method==='POST')return chat?chat(route,body):json({conversation_id:conversation.id,answer:html});

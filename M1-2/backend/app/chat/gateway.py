@@ -14,7 +14,6 @@ class OpenAIChatGateway:
             response = self.client.chat.completions.create(
                 model=self.model,
                 max_completion_tokens=self.max_output_tokens,
-                reasoning_effort='minimal',
                 messages=[{'role': 'system', 'content': system}] +
                          [m.model_dump() for m in messages],
             )

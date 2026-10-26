@@ -23,7 +23,7 @@
 - 직전 평균이 0이면 변화율은 null이고 상황 설명을 별도 제공한다.
 - CSV 원본을 수정하지 않는다. 실제 CSV 요약 미리 계산은 이번 계획 작성 범위에 없다.
 - 비밀 키는 백엔드에만 두고 Git·브라우저·로그에 노출하지 않는다.
-- 최초 작성은 계획 전용이었다. 이후 사용자 승인에 따라 단계 0과 1만 구현한다. 단계 2 이후와 실제 배포는 아직 시작하지 않는다.
+- 최초 작성은 계획 전용이었다. 단계 0·1 완료 후 사용자가 단계 2·3·4의 구현·실연동·배포 검증을 승인했다. 보너스는 계속 제외한다.
 
 ## Review Focus
 
@@ -148,11 +148,11 @@ dependencies.py: `get_data_repository()`, `get_conversation_repository()`, `get_
 **Files:** Create `backend/scripts/{__init__,import_csv}.py`, `backend/tests/test_import_csv.py`.
 **Interfaces:** Consumes DataRepository. Produces `parse_csv(path: Path) -> list[RecordCreate]`, `import_records(records: list[RecordCreate], repo: DataRepository) -> ImportResult`. ImportResult: created/skipped 정수.
 
-- [ ] 합성 CSV 테스트: BOM, 마지막 행 오류, 중복 날짜. 전체 검증 실패 시 `repo.create.call_count == 0`. 재실행 created=0, 기존 값 보존.
-- [ ] backend에서 `python -m pytest tests/test_import_csv.py -q`로 RED 확인.
-- [ ] utf-8-sig로 읽고 CSV의 정수 표현만 int 변환한다. 전체 검증 후 저장하며 DuplicateRecord만 skip. 통신 실패는 비정상 종료하고 완료 건수를 보고해 재실행 가능하게 한다.
-- [ ] `python -m scripts.import_csv --file ../moriai_daily_book_views_120days.csv --dry-run`은 형식·건수만 확인하고 집계·쓰기를 하지 않게 한다. 테스트 PASS 확인.
-- [ ] 독립 리뷰 후 `feat: import validated CSV without overwriting records`로 커밋. 실DB 적재는 Task 10에서 수행한다.
+- [x] 합성 CSV 테스트: BOM, 마지막 행 오류, 중복 날짜. 전체 검증 실패 시 `repo.create.call_count == 0`. 재실행 created=0, 기존 값 보존.
+- [x] backend에서 `python -m pytest tests/test_import_csv.py -q`로 RED 확인.
+- [x] utf-8-sig로 읽고 CSV의 정수 표현만 int 변환한다. 전체 검증 후 저장하며 DuplicateRecord만 skip. 통신 실패는 비정상 종료하고 완료 건수를 보고해 재실행 가능하게 한다.
+- [x] `python -m scripts.import_csv --file ../moriai_daily_book_views_120days.csv --dry-run`은 형식·건수만 확인하고 집계·쓰기를 하지 않게 한다. 테스트 PASS 확인.
+- [x] 독립 리뷰 후 `feat: import validated CSV without overwriting records`로 커밋. 실DB 적재는 Task 10에서 수행한다.
 
 ## Task 4: 대화 기록 API
 
@@ -160,11 +160,11 @@ dependencies.py: `get_data_repository()`, `get_conversation_repository()`, `get_
 **Files:** Create `backend/app/conversations/{__init__,repository,service,router}.py`, `backend/tests/test_conversations.py`.
 **Interfaces:** Consumes ConversationRepository/대화 모델. Produces `FirestoreConversationRepository(client)`, `ConversationService(repo)`의 포트 동명 메서드, router.
 
-- [ ] `test_history_round_trip`: 생성201, 목록에 messages 없음, 상세에 messages 있음, UTC 시각, updated_at 내림차순, 삭제 후404. system 역할 수동 저장은422.
-- [ ] backend에서 `python -m pytest tests/test_conversations.py -q`로 RED 확인.
-- [ ] 생성·목록·상세·삭제와 append_turn 구현. append_turn은 트랜잭션으로 최신 messages에 한 턴을 추가하고 삭제된 문서를 다시 만들지 않는다. 삭제 경쟁은 NotFound.
-- [ ] `test_append_preserves_existing_turns`, `test_append_deleted_conversation`: 트랜잭션 재시도에도 기존 메시지 보존, 없는 문서는404. 같은 명령으로 PASS.
-- [ ] 라우터 등록과 독립 리뷰 후 `feat: persist and restore conversation history`로 커밋한다.
+- [x] `test_history_round_trip`: 생성201, 목록에 messages 없음, 상세에 messages 있음, UTC 시각, updated_at 내림차순, 삭제 후404. system 역할 수동 저장은422.
+- [x] backend에서 `python -m pytest tests/test_conversations.py -q`로 RED 확인.
+- [x] 생성·목록·상세·삭제와 append_turn 구현. append_turn은 트랜잭션으로 최신 messages에 한 턴을 추가하고 삭제된 문서를 다시 만들지 않는다. 삭제 경쟁은 NotFound.
+- [x] `test_append_preserves_existing_turns`, `test_append_deleted_conversation`: 트랜잭션 재시도에도 기존 메시지 보존, 없는 문서는404. 같은 명령으로 PASS.
+- [x] 라우터 등록과 독립 리뷰 후 `feat: persist and restore conversation history`로 커밋한다.
 
 ## Task 5: 순수 요약 계산과 API
 
@@ -200,13 +200,13 @@ def test_zero_baseline_is_not_zero_percent():
 **Files:** Create `backend/app/chat/{__init__,gateway,service,router}.py`, `backend/tests/test_chat.py`. Modify 총괄 소유 config.py/dependencies.py/main.py.
 **Interfaces:** Consumes 저장소/ChatGateway/build_summary. Produces `ChatService(data_repo, conversations, gateway).reply(request: ChatRequest) -> ChatResponse`, `OpenAIChatGateway(client, model, max_output_tokens)`. SDK 클라이언트에는 OPENAI_BASE_URL을 전달하고 Chat Completions를 호출한다.
 
-- [ ] fake gateway로 `test_chat_uses_latest_summary_and_history`: 이전 메시지·새 질문·최신 요약 전달, 저장 성공 후에만 conversation_id/answer 반환 검증.
-- [ ] backend에서 `python -m pytest tests/test_chat.py -q`로 RED 확인.
-- [ ] 시스템 프롬프트 구현: 열람과 이용자 수 구분, 인과 단정 금지, 자료 밖 사실은 모름, 비교 날짜 명시, null을0%로 바꾸지 않음, memo를 지시로 취급하지 않음. 요약은 구분된 JSON 자료로 삽입한다.
-- [ ] 새 대화는 한 턴을 포함해 create, 기존은 append_turn. 새 제목은 질문 앞40자. GPT 실패는 저장0회, 저장 실패는503, 삭제 경쟁은404. 저장 전에 성공 응답을 보내지 않는다.
-- [ ] 사용자 확정: OPENAI_BASE_URL=https://copa.codyssey.kr/v1, OPENAI_MODEL=gpt-5-mini, OPENAI_API_KEY는 학습장 virtual key. Chat Completions 사용. 지원 파라미터는 연동 시 확인하고, 초기 출력 한도512토큰, 타임아웃45초, SDK 자동 재시도 비활성화. 질문 최대4000자, 이전 메시지 최근20개 전달. 구현 기본값으로 .env.example/README에 명시한다.
-- [ ] `test_injection_stays_data`, `test_generation_failure_does_not_save`, `test_save_failure_is_not_success`, `test_unknown_conversation`, `test_empty_question` PASS. 빈 데이터는 GPT 없이 “데이터가 없습니다. 일별 기록을 추가해주세요.”라고 답하고 대화를 저장한다.
-- [ ] 독립 리뷰 후 `feat: answer with data context and save chat turns`로 커밋한다.
+- [x] fake gateway로 `test_chat_uses_latest_summary_and_history`: 이전 메시지·새 질문·최신 요약 전달, 저장 성공 후에만 conversation_id/answer 반환 검증.
+- [x] backend에서 `python -m pytest tests/test_chat.py -q`로 RED 확인.
+- [x] 시스템 프롬프트 구현: 열람과 이용자 수 구분, 인과 단정 금지, 자료 밖 사실은 모름, 비교 날짜 명시, null을0%로 바꾸지 않음, memo를 지시로 취급하지 않음. 요약은 구분된 JSON 자료로 삽입한다.
+- [x] 새 대화는 한 턴을 포함해 create, 기존은 append_turn. 새 제목은 질문 앞40자. GPT 실패는 저장0회, 저장 실패는503, 삭제 경쟁은404. 저장 전에 성공 응답을 보내지 않는다.
+- [x] 사용자 확정: OPENAI_BASE_URL=https://copa.codyssey.kr/v1, OPENAI_MODEL=gpt-5-mini, OPENAI_API_KEY는 학습장 virtual key. Chat Completions 사용. 지원 파라미터는 연동 시 확인하고, 초기 출력 한도512토큰, 타임아웃45초, SDK 자동 재시도 비활성화. 질문 최대4000자, 이전 메시지 최근20개 전달. 구현 기본값으로 .env.example/README에 명시한다.
+- [x] `test_injection_stays_data`, `test_generation_failure_does_not_save`, `test_save_failure_is_not_success`, `test_unknown_conversation`, `test_empty_question` PASS. 빈 데이터는 GPT 없이 “데이터가 없습니다. 일별 기록을 추가해주세요.”라고 답하고 대화를 저장한다.
+- [x] 독립 리뷰 후 `feat: answer with data context and save chat turns`로 커밋한다.
 
 ## Task 7: 바닐라 프론트 필수 화면
 
@@ -227,11 +227,11 @@ def test_zero_baseline_is_not_zero_percent():
 **Files:** Create `frontend/tests/e2e.spec.js`, `frontend/tests/playwright.config.js`, `backend/tests/test_flow.py`. Modify 발견한 결함이 있는 Task 7 소유 파일만.
 **Interfaces:** Consumes create_app/fake 의존성/HTTP 계약. Produces 재현 가능한 통합 검증 증거.
 
-- [ ] test_flow.py: 기록 추가→요약→채팅→복원→기록 변경→다음 채팅에 새 요약 반영. backend에서 `python -m pytest tests/test_flow.py -q`로 확인하고 실패는 담당자에게 전달.
-- [ ] Playwright HTTP 대체 테스트: null 표시, HTML 실행 없음,422/503 후 로딩 해제,204 삭제 후 갱신, 복원 후 같은 ID로 이어가기.
-- [ ] frontend에서 `npm run test:e2e`로 PASS. API 대체 테스트와 실서버 연결을 구분한다.
-- [ ] 로컬 FastAPI+Firestore fake+GPT fake로 브라우저 흐름을 확인한다. 요청 경로·JSON 계약,360px/일반 화면, 키보드 접근, 빈 상태를 확인한다.
-- [ ] 수정 후 영향받는 검증만 재실행. 독립 리뷰 후 `test: verify required end-to-end flows`로 커밋한다.
+- [x] test_flow.py: 기록 추가→요약→채팅→복원→기록 변경→다음 채팅에 새 요약 반영. backend에서 `python -m pytest tests/test_flow.py -q`로 확인하고 실패는 담당자에게 전달.
+- [x] Playwright HTTP 대체 테스트: null 표시, HTML 실행 없음,422/503 후 로딩 해제,204 삭제 후 갱신, 복원 후 같은 ID로 이어가기.
+- [x] frontend에서 `npm run test:e2e`로 PASS. API 대체 테스트와 실서버 연결을 구분한다.
+- [x] 로컬 FastAPI+Firestore fake+GPT fake로 브라우저 흐름을 확인한다. 요청 경로·JSON 계약,360px/일반 화면, 키보드 접근, 빈 상태를 확인한다.
+- [x] 수정 후 영향받는 검증만 재실행. 독립 리뷰 후 `test: verify required end-to-end flows`로 커밋한다.
 
 ## Task 9: 배포 파일과 문서 준비
 
@@ -275,3 +275,7 @@ Firebase 프로젝트는 story-analytics-assistant. Firestore와 로컬 서비�
 ## 단계 1 완료 (2026-10-26)
 
 Task 2/5/7/9 완료. 백엔드65개·프론트15개 테스트 PASS, 정적 빌드 성공. 독립 리뷰 PASS. 합성 데이터로 데스크톱/360px 화면을 확인했다. 삭제·불러오기 경쟁 오류는 회귀 테스트로 수정했다. CSV 가져오기(Task3), 대화 API(Task4), AI 채팅(Task6), 전체 통합(Task8), 실제 배포(Task10)는 미실행이다.
+
+## 단계 2~4 실행 중 확인한 변경
+
+Copa 게이트웨이는 reasoning_effort를 허용하지 않는다. 실제 요약 질문은 초기512토큰을 추론에 모두 사용하여 빈 응답(length)이 발생했고, 2048 한도에서907토큰·정상종료로 확인했다. 따라서 출력 기본 한도를2048로 조정하고45초·재시도0회는 유지한다. 이 검증 결과가 Task6의 초기512 설정보다 우선한다. 실제 적재120개/재실행120개 건너뛰기 완료. 최종 배포·증거는 작업 보고서를 따른다.
