@@ -30,7 +30,6 @@
 | 프론트엔드 | [서비스 접속](https://codyssey-native-frontend.vercel.app) |
 | 백엔드 API | [API 서버](https://codyssey-native.onrender.com) |
 | Swagger UI | [API 문서와 실행](https://codyssey-native.onrender.com/docs) |
-| GitHub | [과제 소스 코드](https://github.com/jimchoi9/codyssey-native/tree/main/M1-2) |
 
 배포 브랜치는 `main`입니다. 구현 및 검증 내역은 [작업 보고서](docs/stages-2-4-report.md)와 [배포 체크리스트](docs/deployment-checklist.md)에 기록했습니다.
 
