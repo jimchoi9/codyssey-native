@@ -23,7 +23,7 @@
 - 직전 평균이 0이면 변화율은 null이고 상황 설명을 별도 제공한다.
 - CSV 원본을 수정하지 않는다. 실제 CSV 요약 미리 계산은 이번 계획 작성 범위에 없다.
 - 비밀 키는 백엔드에만 두고 Git·브라우저·로그에 노출하지 않는다.
-- 현재 요청은 계획 작성이다. 아래 체크박스는 향후 실행용이며 설치·앱 구현·배포를 시작하지 않는다.
+- 최초 작성은 계획 전용이었다. 이후 사용자 승인에 따라 단계 0과 1만 구현한다. 단계 2 이후와 실제 배포는 아직 시작하지 않는다.
 
 ## Review Focus
 
@@ -93,7 +93,7 @@ frontend/
   scripts/build.mjs
   tests/{api,build}.test.mjs, e2e.spec.js, playwright.config.js
   package.json
-render.yaml, vercel.json, .gitignore, README.md
+render.yaml, frontend/vercel.json, .gitignore, README.md
 docs/deployment-checklist.md, docs/screenshots/
 ```
 
@@ -136,11 +136,11 @@ dependencies.py: `get_data_repository()`, `get_conversation_repository()`, `get_
 **Files:** Create `backend/app/data/{__init__,repository,service,router}.py`, `backend/tests/test_data_api.py`, `backend/tests/test_data_repository.py`.
 **Interfaces:** Consumes DataRepository/Record. Produces `FirestoreDataRepository(client)`, `DataService(repo)`의 list_records/create/update/delete(포트와 동일 서명), router.
 
-- [ ] `test_data_crud`: POST=201, id=date, 중복=409, PUT 후 값 반영, DELETE=204, 삭제 후 PUT=404, 목록 날짜 오름차순을 검증한다.
-- [ ] backend에서 `python -m pytest tests/test_data_api.py tests/test_data_repository.py -q`로 RED 확인.
-- [ ] data 컬렉션 연결 구현. document.create로 원자적 추가, 기존 문서는409. 수정은 upsert하지 않고 날짜 변경을 거절한다.
-- [ ] `test_atomic_duplicate`: SDK AlreadyExists를 모의하여409 확인. 저장 장애는 비밀 없는503으로 변환. 같은 명령으로 PASS 확인.
-- [ ] 총괄의 라우터 등록과 독립 리뷰 후 `feat: implement daily reading data CRUD`로 커밋한다.
+- [x] `test_data_crud`: POST=201, id=date, 중복=409, PUT 후 값 반영, DELETE=204, 삭제 후 PUT=404, 목록 날짜 오름차순을 검증한다.
+- [x] backend에서 `python -m pytest tests/test_data_api.py tests/test_data_repository.py -q`로 RED 확인.
+- [x] data 컬렉션 연결 구현. document.create로 원자적 추가, 기존 문서는409. 수정은 upsert하지 않고 날짜 변경을 거절한다.
+- [x] `test_atomic_duplicate`: SDK AlreadyExists를 모의하여409 확인. 저장 장애는 비밀 없는503으로 변환. 같은 명령으로 PASS 확인.
+- [x] 총괄의 라우터 등록과 독립 리뷰 후 `feat: implement daily reading data CRUD`로 커밋한다.
 
 ## Task 3: CSV 초기 가져오기
 
@@ -172,7 +172,7 @@ dependencies.py: `get_data_repository()`, `get_conversation_repository()`, `get_
 **Files:** Create `backend/app/summary/{__init__,service,router}.py`, `backend/tests/test_summary.py`.
 **Interfaces:** Consumes list[Record]. Produces `build_summary(records: list[Record]) -> Summary`, router. 요약 API와 채팅은 같은 함수를 쓴다.
 
-- [ ] 아래 합성 데이터 테스트 작성. 실제 CSV 요약은 미리 계산하지 않는다.
+- [x] 아래 합성 데이터 테스트 작성. 실제 CSV 요약은 미리 계산하지 않는다.
 
 ```python
 def test_five_days_excludes_oldest_only_from_comparison():
@@ -189,10 +189,10 @@ def test_zero_baseline_is_not_zero_percent():
     assert s.comparison.trend == "increase"
 ```
 
-- [ ] 같은 테스트 파일에 `records_from_values(values: list[int], start: date = date(2026, 1, 1)) -> list[Record]` fixture를 만들고 `python -m pytest tests/test_summary.py -q`로 RED 확인.
-- [ ] 날짜 정렬→기간 내0 보완→전체 통계→k=min(7,N//2) 비교 구현. 전체 통계와 비교 범위를 구분하고 최대·최소 동률 날짜를 모두 반환한다.
-- [ ] 0/1/2/13/14/15일, 누락일, 순서 뒤섞임, 양쪽0, 감소, 동일, 반올림 전 미세한 차이를 테스트하여 PASS. 빈 데이터/1일은 window_days=0와 비교 필드 null. 기준은 데이터 마지막 날짜.
-- [ ] 라우터 등록과 독립 리뷰 후 `feat: calculate agreed date-based reading summary`로 커밋한다.
+- [x] 같은 테스트 파일에 `records_from_values(values: list[int], start: date = date(2026, 1, 1)) -> list[Record]` fixture를 만들고 `python -m pytest tests/test_summary.py -q`로 RED 확인.
+- [x] 날짜 정렬→기간 내0 보완→전체 통계→k=min(7,N//2) 비교 구현. 전체 통계와 비교 범위를 구분하고 최대·최소 동률 날짜를 모두 반환한다.
+- [x] 0/1/2/13/14/15일, 누락일, 순서 뒤섞임, 양쪽0, 감소, 동일, 반올림 전 미세한 차이를 테스트하여 PASS. 빈 데이터/1일은 window_days=0와 비교 필드 null. 기준은 데이터 마지막 날짜.
+- [x] 라우터 등록과 독립 리뷰 후 `feat: calculate agreed date-based reading summary`로 커밋한다.
 
 ## Task 6: GPT 채팅과 자동 저장
 
@@ -214,12 +214,12 @@ def test_zero_baseline_is_not_zero_percent():
 **Files:** Create `frontend/index.html`, `frontend/styles.css`, `frontend/config.example.js`, `frontend/js/{api,app,data,summary,chat,conversations}.js`, `frontend/tests/api.test.mjs`.
 **Interfaces:** Consumes HTTP 계약. Produces `request(path, options = {}) -> Promise<object|null>`, 각 화면 `initData/initSummary/initChat/initConversations(root, api)`. api에는 request 함수를 전달하고 data-changed/conversation-changed CustomEvent로 변경을 알린다.
 
-- [ ] fetch 대체 테스트: 204→null, 422→detail을 가진 Error, 통신 실패→Error. 과제 폴더에서 `node --test frontend/tests/api.test.mjs`로 RED 확인.
-- [ ] API 헬퍼 구현 후 PASS. window.APP_CONFIG.API_BASE_URL을 읽고 없으면 명확한 오류를 표시한다.
-- [ ] 데이터 추가·목록·횟수/메모 수정·삭제, 요약, 대화 목록·복원·삭제, 채팅·새 대화 구현. 외형만 따라 하는 단위 테스트는 만들지 않는다.
-- [ ] 질문·memo·답변은 textContent로 표시. 전송 중 버튼 비활성화,10초 후 지연 안내, 종료 시 로딩 해제. 자동 재전송 없음. API 타임아웃60초로 서버보다 먼저 정상 응답을 끊지 않는다.
-- [ ] 저장 성공 후 목록/요약 갱신. null은 “계산 불가”와 message로 표시하고0과 구분. 날짜 수정UI 없음. 합성 fixture를 운영 fallback으로 쓰지 않는다.
-- [ ] 안정된 입력 label·버튼 role 제공. 독립 리뷰 후 `feat: build required vanilla web interface`로 커밋한다.
+- [x] fetch 대체 테스트: 204→null, 422→detail을 가진 Error, 통신 실패→Error. 과제 폴더에서 `node --test frontend/tests/api.test.mjs`로 RED 확인.
+- [x] API 헬퍼 구현 후 PASS. window.APP_CONFIG.API_BASE_URL을 읽고 없으면 명확한 오류를 표시한다.
+- [x] 데이터 추가·목록·횟수/메모 수정·삭제, 요약, 대화 목록·복원·삭제, 채팅·새 대화 구현. 외형만 따라 하는 단위 테스트는 만들지 않는다.
+- [x] 질문·memo·답변은 textContent로 표시. 전송 중 버튼 비활성화,10초 후 지연 안내, 종료 시 로딩 해제. 자동 재전송 없음. API 타임아웃60초로 서버보다 먼저 정상 응답을 끊지 않는다.
+- [x] 저장 성공 후 목록/요약 갱신. null은 “계산 불가”와 message로 표시하고0과 구분. 날짜 수정UI 없음. 합성 fixture를 운영 fallback으로 쓰지 않는다.
+- [x] 안정된 입력 label·버튼 role 제공. 독립 리뷰 후 `feat: build required vanilla web interface`로 커밋한다.
 
 ## Task 8: 화면·API 통합 검증
 
@@ -236,15 +236,15 @@ def test_zero_baseline_is_not_zero_percent():
 ## Task 9: 배포 파일과 문서 준비
 
 **Owner/Dependencies:** C, Task 1 이후 병렬. 실제 배포는 하지 않는다.
-**Files:** Create `frontend/scripts/build.mjs`, `frontend/tests/build.test.mjs`, `frontend/package.json`, `render.yaml`, `vercel.json`, `README.md`, `docs/deployment-checklist.md`. .gitignore 변경은 총괄에게 요청.
+**Files:** Create `frontend/scripts/build.mjs`, `frontend/tests/build.test.mjs`, `frontend/package.json`, `render.yaml`, `frontend/vercel.json`, `README.md`, `docs/deployment-checklist.md`. .gitignore 변경은 총괄에게 요청.
 **Interfaces:** Consumes 프론트 소스/API_BASE_URL. Produces frontend/dist와 config.js의 `window.APP_CONFIG = { API_BASE_URL }`.
 
-- [ ] 빌드 테스트: 공개 설정에는 API_BASE_URL만 포함, 가짜 OPENAI_API_KEY가 있어도 출력에 없음, API_BASE_URL 누락 시 실패.
-- [ ] 과제 폴더에서 `node --test frontend/tests/build.test.mjs`로 RED 확인.
-- [ ] Node로 HTML/CSS/js/config를 dist에 출력. 설정은 JSON.stringify로 직렬화. package.json에 build·단위 테스트·Playwright E2E 명령을 정의한다.
-- [ ] Git 루트 기준 Render 경로 M1-2/backend, Vercel 경로 M1-2/frontend. Render 시작 `uvicorn app.main:app --host 0.0.0.0 --port "$PORT"`. Vercel build `npm run build`, 출력 dist. 서비스 설정 파일 위치·스키마는 구현 시 공식 문서로 확인한다.
-- [ ] 같은 테스트로 PASS. README에 실행/검증/CSV 가져오기/환경 변수/출력 제한/지연 안내 작성. 없는 URL·스크린샷은 미완료 표시. 비밀키·원본 CSV는 프론트 dist에 포함하지 않는다.
-- [ ] 독립 리뷰 후 `build: prepare deployment and runtime configuration`으로 커밋한다.
+- [x] 빌드 테스트: 공개 설정에는 API_BASE_URL만 포함, 가짜 OPENAI_API_KEY가 있어도 출력에 없음, API_BASE_URL 누락 시 실패.
+- [x] 과제 폴더에서 `node --test frontend/tests/build.test.mjs`로 RED 확인.
+- [x] Node로 HTML/CSS/js/config를 dist에 출력. 설정은 JSON.stringify로 직렬화. package.json에 build·단위 테스트·Playwright E2E 명령을 정의한다.
+- [x] Git 루트 기준 Render 경로 M1-2/backend, Vercel 경로 M1-2/frontend. Render 시작 `uvicorn app.main:app --host 0.0.0.0 --port "$PORT"`. Vercel build `npm run build`, 출력 dist. 서비스 설정 파일 위치·스키마는 구현 시 공식 문서로 확인한다.
+- [x] 같은 테스트로 PASS. README에 실행/검증/CSV 가져오기/환경 변수/출력 제한/지연 안내 작성. 없는 URL·스크린샷은 미완료 표시. 비밀키·원본 CSV는 프론트 dist에 포함하지 않는다.
+- [x] 독립 리뷰 후 `build: prepare deployment and runtime configuration`으로 커밋한다.
 
 ## Task 10: 실제 연동·배포·제출 증거
 
@@ -271,3 +271,7 @@ def test_zero_baseline_is_not_zero_percent():
 ## 외부 설정 후속 반영 (2026-10-26)
 
 Firebase 프로젝트는 story-analytics-assistant. Firestore와 로컬 서비스 계정 JSON은 사용자가 준비 완료했다고 알렸다. 키 경로와 virtual key는 backend/.env에 설정한다. Base URL과 모델은 .env.example에 반영했으며 실제 호출은 아직 하지 않았다. Task 6은 위 Chat Completions 계약을 따른다.
+
+## 단계 1 완료 (2026-10-26)
+
+Task 2/5/7/9 완료. 백엔드65개·프론트15개 테스트 PASS, 정적 빌드 성공. 독립 리뷰 PASS. 합성 데이터로 데스크톱/360px 화면을 확인했다. 삭제·불러오기 경쟁 오류는 회귀 테스트로 수정했다. CSV 가져오기(Task3), 대화 API(Task4), AI 채팅(Task6), 전체 통합(Task8), 실제 배포(Task10)는 미실행이다.

@@ -1,0 +1,12 @@
+{
+  "name": "story-analytics-assistant-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:e2e": "node -e \"console.error('Later stage: Task 8 Playwright tests and dependencies are not implemented yet.'); process.exit(1)\""
+  }
+}
