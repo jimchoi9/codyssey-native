@@ -24,3 +24,14 @@ The three dependency providers deliberately raise controlled storage (503) or
 answer-generation (502) errors until adapters are implemented. Tests can replace
 them through `app.dependency_overrides`. Fakes are test utilities only. No CSV
 aggregation, database upload, GPT request, or deployment runs at this stage.
+
+## 확정된 연결 설정
+
+- Firebase 프로젝트: `story-analytics-assistant` (Firestore 생성 완료: 사용자 확인)
+- 서비스 계정은 `GOOGLE_APPLICATION_CREDENTIALS`에 로컬 JSON의 절대 경로 지정
+- `OPENAI_API_KEY`: 학습장에서 발급한 virtual key를 로컬 `.env`에만 입력
+- `OPENAI_BASE_URL`: `https://copa.codyssey.kr/v1`
+- `OPENAI_MODEL`: `gpt-5-mini`
+- 호출 방식: Chat Completions. 후속 gateway는 이 Base URL을 SDK 클라이언트에 명시적으로 전달한다.
+
+현재는 설정 읽기만 지원하며, 실제 게이트웨이 호출이나 인증 검증은 수행하지 않았다.

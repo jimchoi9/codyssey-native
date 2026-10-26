@@ -11,6 +11,7 @@ class Settings:
     firebase_project_id: str | None = None
     google_application_credentials: str | None = field(default=None, repr=False)
     openai_api_key: str | None = field(default=None, repr=False)
+    openai_base_url: str | None = None
     openai_model: str | None = None
     openai_max_output_tokens: int = 512
     openai_timeout_seconds: float = 45
@@ -25,5 +26,6 @@ def get_settings() -> Settings:
         firebase_project_id=os.getenv('FIREBASE_PROJECT_ID') or None,
         google_application_credentials=os.getenv('GOOGLE_APPLICATION_CREDENTIALS') or None,
         openai_api_key=os.getenv('OPENAI_API_KEY') or None,
+        openai_base_url=os.getenv('OPENAI_BASE_URL') or None,
         openai_model=os.getenv('OPENAI_MODEL') or None,
     )

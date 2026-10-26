@@ -209,3 +209,14 @@ GPT 호출 실패 시 성공한 답변처럼 저장하지 않는다. 저장 실�
 - 프론트와 백엔드 배포 URL, CORS, `/docs`, README와 제출 스크린샷을 확인한다.
 
 위 항목은 향후 검증 기준이며, 현재 구현 또는 테스트가 완료됐다는 뜻이 아니다.
+
+## 11. 사용자 확정 외부 연결 설정 (2026-10-26)
+
+- Firebase 프로젝트 ID: `story-analytics-assistant`
+- Firestore 생성, 서비스 계정 JSON 로컬 저장 완료 (사용자 확인; 실제 연결 검증 전)
+- 인증: 학습장 발급 virtual key를 `OPENAI_API_KEY`에 설정
+- OpenAI SDK Base URL: `https://copa.codyssey.kr/v1` (`OPENAI_BASE_URL`)
+- 모델 ID: `gpt-5-mini` (`OPENAI_MODEL`)
+- 호출 방식: Chat Completions
+- 서비스 계정 절대 경로는 `GOOGLE_APPLICATION_CREDENTIALS`로 제공한다.
+- 위 값은 기존의 미정 모델/직접 OpenAI 연결 가정보다 우선한다. 실제 키는 문서에 기록하지 않는다.

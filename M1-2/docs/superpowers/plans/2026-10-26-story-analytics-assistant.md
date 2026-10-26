@@ -198,13 +198,13 @@ def test_zero_baseline_is_not_zero_percent():
 
 **Owner/Dependencies:** 총괄, Task 4/5 이후.
 **Files:** Create `backend/app/chat/{__init__,gateway,service,router}.py`, `backend/tests/test_chat.py`. Modify 총괄 소유 config.py/dependencies.py/main.py.
-**Interfaces:** Consumes 저장소/ChatGateway/build_summary. Produces `ChatService(data_repo, conversations, gateway).reply(request: ChatRequest) -> ChatResponse`, `OpenAIChatGateway(client, model, max_output_tokens)`.
+**Interfaces:** Consumes 저장소/ChatGateway/build_summary. Produces `ChatService(data_repo, conversations, gateway).reply(request: ChatRequest) -> ChatResponse`, `OpenAIChatGateway(client, model, max_output_tokens)`. SDK 클라이언트에는 OPENAI_BASE_URL을 전달하고 Chat Completions를 호출한다.
 
 - [ ] fake gateway로 `test_chat_uses_latest_summary_and_history`: 이전 메시지·새 질문·최신 요약 전달, 저장 성공 후에만 conversation_id/answer 반환 검증.
 - [ ] backend에서 `python -m pytest tests/test_chat.py -q`로 RED 확인.
 - [ ] 시스템 프롬프트 구현: 열람과 이용자 수 구분, 인과 단정 금지, 자료 밖 사실은 모름, 비교 날짜 명시, null을0%로 바꾸지 않음, memo를 지시로 취급하지 않음. 요약은 구분된 JSON 자료로 삽입한다.
 - [ ] 새 대화는 한 턴을 포함해 create, 기존은 append_turn. 새 제목은 질문 앞40자. GPT 실패는 저장0회, 저장 실패는503, 삭제 경쟁은404. 저장 전에 성공 응답을 보내지 않는다.
-- [ ] SDK 호출법은 구현 시 공식 문서로 확인. OPENAI_MODEL 명시 설정, 초기 출력 한도512토큰, 타임아웃45초, SDK 자동 재시도 비활성화. 질문 최대4000자, 이전 메시지 최근20개 전달. 구현 기본값으로 .env.example/README에 명시한다.
+- [ ] 사용자 확정: OPENAI_BASE_URL=https://copa.codyssey.kr/v1, OPENAI_MODEL=gpt-5-mini, OPENAI_API_KEY는 학습장 virtual key. Chat Completions 사용. 지원 파라미터는 연동 시 확인하고, 초기 출력 한도512토큰, 타임아웃45초, SDK 자동 재시도 비활성화. 질문 최대4000자, 이전 메시지 최근20개 전달. 구현 기본값으로 .env.example/README에 명시한다.
 - [ ] `test_injection_stays_data`, `test_generation_failure_does_not_save`, `test_save_failure_is_not_success`, `test_unknown_conversation`, `test_empty_question` PASS. 빈 데이터는 GPT 없이 “데이터가 없습니다. 일별 기록을 추가해주세요.”라고 답하고 대화를 저장한다.
 - [ ] 독립 리뷰 후 `feat: answer with data context and save chat turns`로 커밋한다.
 
@@ -267,3 +267,7 @@ def test_zero_baseline_is_not_zero_percent():
 - 공통 함수·모델은 한곳에서 정의하며 후속 작업은 같은 계약을 사용한다.
 - 문자 수·타임아웃 등 구현 기본값은 사용자 확정 요구와 구별했다. 새로운 제품 기능은 추가하지 않는다.
 - 2026-10-26: 단계 0 / Task 1 완료. 계약 테스트 28개 PASS, 독립 리뷰 PASS. Python 3.13에서 검증했으며 3.10 실행은 미검증. Task 2 이후, 실데이터 집계·DB 쓰기·배포는 미실행.
+
+## 외부 설정 후속 반영 (2026-10-26)
+
+Firebase 프로젝트는 story-analytics-assistant. Firestore와 로컬 서비스 계정 JSON은 사용자가 준비 완료했다고 알렸다. 키 경로와 virtual key는 backend/.env에 설정한다. Base URL과 모델은 .env.example에 반영했으며 실제 호출은 아직 하지 않았다. Task 6은 위 Chat Completions 계약을 따른다.
