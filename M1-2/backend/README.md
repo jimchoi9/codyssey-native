@@ -1,4 +1,4 @@
-# Backend foundation (Stage 0)
+# Backend (Stage 1)
 
 Use Python 3.10 or later. From this worktree's `M1-2/backend` directory:
 
@@ -11,7 +11,9 @@ uvicorn app.main:app --reload
 ```
 
 Open http://127.0.0.1:8000/docs or http://127.0.0.1:8000/openapi.json.
-These work without credentials. No business API routes or external adapters are implemented yet.
+These work without credentials. Data CRUD and `/api/data/summary` are registered.
+Actual data requests lazily initialize Firestore and require configured credentials; tests inject fake storage.
+Conversation and chat endpoints are deferred to later stages.
 
 Copy `.env.example` to `backend/.env` (or `.env` when already in this directory)
 to configure exact, comma-separated frontend origins. Never paste real keys into chat
@@ -20,10 +22,11 @@ server-only and are unnecessary for Stage 0 tests. The model must be chosen expl
 before a later-stage GPT adapter is enabled. Its planned policy is 512 output tokens,
 45 seconds timeout, and zero automatic retries.
 
-The three dependency providers deliberately raise controlled storage (503) or
-answer-generation (502) errors until adapters are implemented. Tests can replace
-them through `app.dependency_overrides`. Fakes are test utilities only. No CSV
-aggregation, database upload, GPT request, or deployment runs at this stage.
+The data provider initializes Firebase only when needed. Missing credentials or storage failures
+return a sanitized 503. Conversation/generation providers remain unavailable until their later stages.
+Tests replace providers through `app.dependency_overrides` and do not load local `.env` secrets.
+Summary logic has been tested with synthetic records; the real CSV has not been aggregated or uploaded.
+No GPT request or deployment has run at this stage.
 
 ## 확정된 연결 설정
 
@@ -34,4 +37,5 @@ aggregation, database upload, GPT request, or deployment runs at this stage.
 - `OPENAI_MODEL`: `gpt-5-mini`
 - 호출 방식: Chat Completions. 후속 gateway는 이 Base URL을 SDK 클라이언트에 명시적으로 전달한다.
 
-현재는 설정 읽기만 지원하며, 실제 게이트웨이 호출이나 인증 검증은 수행하지 않았다.
+Firebase 데이터 어댑터와 요약 API를 구현했으며, 실제 연결·인증 검증은 아직 수행하지 않았다.
+AI 게이트웨이는 설정 읽기만 지원한다.

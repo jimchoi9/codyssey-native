@@ -36,6 +36,10 @@ def create_app() -> FastAPI:
 
     for error_type in (*ERRORS, Exception):
         application.add_exception_handler(error_type, safe_error)
+    from .summary.router import router as summary_router
+    from .data.router import router as data_router
+    application.include_router(summary_router)
+    application.include_router(data_router)
     return application
 
 
