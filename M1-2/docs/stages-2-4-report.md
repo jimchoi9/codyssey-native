@@ -14,6 +14,11 @@
 - 사용자 준비: main push, Render/Vercel 연결·환경 변수·Secret File 등록 완료.
 - 공개 API 주소와 Vercel 공개 config.js의 연결 일치 확인.
 - SDK로 지정 프로젝트 story-analytics-assistant 접근 확인. CSV 적재 전 data 컬렉션 0개.
-- CSV dry-run 120개 통과. 실제 적재·AI·최종 배포 검증 진행 중.
+- CSV dry-run120, 최초 created120/skipped0, 재실행 created0/skipped120. 원본 SHA256 불변.
+- 실제 앱 Chat200: 2026-10-12~18 일평균12.00회, 2026-10-19~25 일평균19.43회, 증가61.90% 답변 확인. 대화 저장·상세 복원 확인.
+- 임시 날짜 기록 추가3→수정5→AI가 갱신 합계2116회 응답→임시 기록/대화 삭제. 원래 요약2111회·120개 완전히 복원.
+- Copa에서 reasoning_effort는400 unsupported_feature. 해당 옵션 제거. 초기512토큰은 추론 중 소진되어 빈 응답;2048로 변경 후 정상 종료(검증 요청907토큰). 타임아웃45초·자동재시도0 유지.
+- 최종 독립 리뷰: 명세/코드 품질 PASS. backend README의 과거 상태 문구 수정.
+- main 반영 및 공개 배포·스크린샷 검증은 진행 중.
 
 이 문서의 실제 연결 결과는 실행이 끝나는 대로 갱신한다. 가짜 응답을 배포·AI 성공 증거로 사용하지 않는다.

@@ -18,7 +18,7 @@
 - [x] 재실행 created=0/skipped=120 (덮어쓰기 없음)
 - [x] Copa Chat Completions 지원 옵션 확인: reasoning_effort 미지원, max_completion_tokens 지원
 - [x] 512토큰 빈 응답 원인 확인; 2048 한도에서 정상 답변 확인
-- [ ] 앱을 통한 실제 AI 대화 저장·복원·이어가기 최종 확인
+- [x] 실제 앱 AI 대화 저장·복원, 임시 기록 수정 후 최신 합계 반영 확인 (공개 브라우저 이어가기는 배포 후 검증)
 
 ## 배포 설정
 
