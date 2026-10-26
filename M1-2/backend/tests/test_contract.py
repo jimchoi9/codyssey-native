@@ -92,6 +92,8 @@ def test_unconfigured_dependencies_fail_safely_and_can_be_overridden(monkeypatch
     dependency = getattr(dependencies, provider)
     @app.get('/test-dependency')
     def probe(value=Depends(dependency)):
+        if provider == 'get_chat_gateway' and hasattr(value, 'complete'):
+            value.complete('rules', [])
         return {'configured': value is not None}
     with TestClient(app, raise_server_exceptions=False) as client:
         assert client.get('/test-dependency').status_code == status

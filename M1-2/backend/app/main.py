@@ -40,6 +40,10 @@ def create_app() -> FastAPI:
     from .data.router import router as data_router
     application.include_router(summary_router)
     application.include_router(data_router)
+    from .chat.router import router as chat_router
+    application.include_router(chat_router)
+    from .conversations.router import router as conversation_router
+    application.include_router(conversation_router)
     return application
 
 

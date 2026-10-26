@@ -27,8 +27,41 @@ def get_data_repository() -> DataRepository:
 
 
 def get_conversation_repository() -> ConversationRepository:
-    raise StorageUnavailable("Conversation storage is not configured")
+    settings = get_settings()
+    if not settings.firebase_project_id or not settings.google_application_credentials:
+        raise StorageUnavailable("Conversation storage is not configured")
+    try:
+        from .conversations.repository import FirestoreConversationRepository
+        client = _build_firestore_client(settings.firebase_project_id, settings.google_application_credentials)
+        return FirestoreConversationRepository(client)
+    except Exception:
+        raise StorageUnavailable("Storage is temporarily unavailable.") from None
+
+
+class _LazyChatGateway:
+    def complete(self, system, messages):
+        client = None
+        try:
+            settings = get_settings()
+            if not settings.openai_api_key or not settings.openai_model:
+                raise GenerationUnavailable("Answer generation is not configured")
+            from openai import OpenAI
+            from .chat.gateway import OpenAIChatGateway
+            client = OpenAI(api_key=settings.openai_api_key,
+                            base_url=settings.openai_base_url,
+                            timeout=settings.openai_timeout_seconds,
+                            max_retries=settings.openai_max_retries)
+            return OpenAIChatGateway(client, settings.openai_model,
+                                     settings.openai_max_output_tokens).complete(system, messages)
+        except Exception:
+            raise GenerationUnavailable("Answer generation is temporarily unavailable.") from None
+        finally:
+            if client is not None:
+                try:
+                    client.close()
+                except Exception:
+                    pass
 
 
 def get_chat_gateway() -> ChatGateway:
-    raise GenerationUnavailable("Answer generation is not configured")
+    return _LazyChatGateway()

@@ -18,9 +18,10 @@ Conversation and chat endpoints are deferred to later stages.
 Copy `.env.example` to `backend/.env` (or `.env` when already in this directory)
 to configure exact, comma-separated frontend origins. Never paste real keys into chat
 or commit `.env` or service-account JSON. Firebase and OpenAI credentials remain
-server-only and are unnecessary for Stage 0 tests. The model must be chosen explicitly
-before a later-stage GPT adapter is enabled. Its planned policy is 512 output tokens,
-45 seconds timeout, and zero automatic retries.
+server-only and are unnecessary for Stage 0 tests. The configured model is gpt-5-mini via the Copa Chat Completions gateway. The adapter
+uses a 512 completion token limit, minimal reasoning effort, a 45 second timeout,
+and zero automatic retries. Gateway initialization occurs only when generation is needed;
+empty-data replies are saved without OpenAI credentials.
 
 The data provider initializes Firebase only when needed. Missing credentials or storage failures
 return a sanitized 503. Conversation/generation providers remain unavailable until their later stages.
@@ -35,7 +36,7 @@ No GPT request or deployment has run at this stage.
 - `OPENAI_API_KEY`: 학습장에서 발급한 virtual key를 로컬 `.env`에만 입력
 - `OPENAI_BASE_URL`: `https://copa.codyssey.kr/v1`
 - `OPENAI_MODEL`: `gpt-5-mini`
-- 호출 방식: Chat Completions. 후속 gateway는 이 Base URL을 SDK 클라이언트에 명시적으로 전달한다.
+- 호출 방식: Chat Completions. gateway는 이 Base URL을 SDK 클라이언트에 명시적으로 전달한다.
 
 Firebase 데이터 어댑터와 요약 API를 구현했으며, 실제 연결·인증 검증은 아직 수행하지 않았다.
-AI 게이트웨이는 설정 읽기만 지원한다.
+AI 게이트웨이는 Chat Completions를 사용한다.
