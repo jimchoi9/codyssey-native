@@ -2,7 +2,7 @@ import {test, expect} from '@playwright/test';
 
 const html='<img src=x onerror="window.injected=true">';
 const record={id:'2026-10-25',date:'2026-10-25',value:10,memo:html};
-const summary={period:{start:'2026-10-24',end:'2026-10-25'},count:1,calendar_days:2,filled_zero_days:1,metrics:{total:10,daily_average:5,max:{value:10,dates:['2026-10-25']},min:{value:0,dates:['2026-10-24']}},comparison:{status:'zero_baseline',window_days:1,previous:{start:'2026-10-24',end:'2026-10-24',average:0},recent:{start:'2026-10-25',end:'2026-10-25',average:10},change_percent:null,trend:'increase',message:'기준값이 0이므로 변화율은 계산하지 않습니다.'},notable_memos:[record]};
+const summary={period:{start:'2026-10-24',end:'2026-10-25'},count:1,calendar_days:2,filled_zero_days:1,metrics:{total:10,daily_average:5,max:{value:10,dates:['2026-10-25']},min:{value:0,dates:['2026-10-24']}},comparison:{status:'zero_baseline',window_days:1,previous:{start:'2026-10-24',end:'2026-10-24',average:0},recent:{start:'2026-10-25',end:'2026-10-25',average:10},change_percent:null,trend:'increase',message:'기준값이 0이므로 변화율은 계산하지 않습니다.'},notable_memos:Array.from({length:120},()=>({...record}))};
 const conversation={id:'saved-conversation',title:html,created_at:'2026-10-25T01:00:00Z',updated_at:'2026-10-25T01:00:00Z',messages:[{role:'user',content:'이전 질문',created_at:'2026-10-25T01:00:00Z'},{role:'assistant',content:html,created_at:'2026-10-25T01:00:00Z'}]};
 
 test.beforeEach(async ({page})=>{
@@ -39,6 +39,12 @@ test('null change rate remains unavailable and HTML stays inert across all rende
   await expect(page.locator('.comparison')).toContainText('최근 1일 2026-10-25');
   await expect(page.locator('#data-list')).toContainText(html);
   await expect(page.locator('.memo-list')).toContainText(html);
+  await expect(page.locator('.memo-list li')).toHaveCount(120);
+  expect(await page.locator('.memo-list').evaluate(el=>el.getBoundingClientRect().height)).toBeLessThanOrEqual(220);
+  await expect(page.locator('.memo-list')).toHaveAttribute('tabindex','0');
+  await page.locator('.memo-list').focus();
+  await page.keyboard.press('ArrowDown');
+  await expect.poll(()=>page.locator('.memo-list').evaluate(el=>el.scrollTop)).toBeGreaterThan(0);
   await page.locator('.history-open').click();
   await expect(page.locator('#chat-messages')).toContainText(html);
   await page.getByLabel('데이터에 질문하기').fill(html);

@@ -21,7 +21,7 @@ export function initSummary(root, api) {
       if (c.previous && c.recent) { comparison.append(node('p', `직전 ${c.window_days}일 ${c.previous.start} ~ ${c.previous.end} · 일평균 ${number(c.previous.average)}회`), node('p', `최근 ${c.window_days}일 ${c.recent.start} ~ ${c.recent.end} · 일평균 ${number(c.recent.average)}회`)); }
       const trend = {increase:'증가',decrease:'감소',unchanged:'유지',insufficient_data:'비교 기간 부족'}[c.trend] || '';
       comparison.append(node('p', `변화율: ${c.change_percent == null ? '계산 불가' : `${number(c.change_percent)}%`} · ${trend}`), node('p', c.message)); content.append(comparison);
-      if (s.notable_memos.length) { content.append(node('h3', '기록에 남긴 메모')); const memos = node('ul', '', 'memo-list'); for (const item of s.notable_memos) memos.append(node('li', `${item.date} · ${item.value}회 · ${item.memo}`)); content.append(memos); }
+      if (s.notable_memos.length) { content.append(node('h3', '기록에 남긴 메모')); const memos = node('ul', '', 'memo-list'); memos.tabIndex = 0; memos.setAttribute('aria-label', '기록에 남긴 메모'); for (const item of s.notable_memos) memos.append(node('li', `${item.date} · ${item.value}회 · ${item.memo}`)); content.append(memos); }
     } catch (error) { if (ticket === revision) { status.textContent = error.message; status.classList.add('error'); content.replaceChildren(); } }
   }
   root.querySelector('#summary-refresh').addEventListener('click', refresh); root.addEventListener('data-changed', refresh); refresh();
